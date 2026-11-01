@@ -3,14 +3,28 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KatalogController;
+use App\Http\Controllers\KeranjangController;
+use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\PesananController;
+use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\PengirimanController;
+use App\Http\Controllers\Admin\ProdukController;
+use App\Http\Controllers\Admin\StokMasukController;
+use App\Http\Controllers\Admin\SupplierController;
+use App\Http\Controllers\Admin\TransaksiController;
 use App\Http\Middleware\Peran;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    $u = auth()->user();
-    if (! $u) return redirect()->route('login');
-    return redirect()->route($u->isStaf() ? 'admin.dashboard' : 'beranda');
+    // Beranda terbuka untuk umum; hanya staf yang diarahkan ke dashboard admin
+    return redirect()->route(auth()->user()?->isStaf() ? 'admin.dashboard' : 'beranda');
 });
+
+// Beranda pelanggan: tanpa login
+Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
+Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
+Route::get('/produk/{id}', [KatalogController::class, 'show'])->whereNumber('id')->name('produk');
 
 Route::middleware('guest')->group(function () {
     Route::get('/masuk', [AuthController::class, 'show'])->name('login');
@@ -20,8 +34,55 @@ Route::middleware('guest')->group(function () {
 
 Route::post('/keluar', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
-Route::middleware(['auth', Peran::class . ':pelanggan'])->get('/beranda', [BerandaController::class, 'index'])->name('beranda');
+Route::middleware(['auth', Peran::class . ':pelanggan'])->group(function () {
+    Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
+    Route::post('/keranjang', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
+    Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
+    Route::patch('/keranjang/{id}', [KeranjangController::class, 'ubah'])->whereNumber('id')->name('keranjang.ubah');
+    Route::delete('/keranjang/{id}', [KeranjangController::class, 'buang'])->whereNumber('id')->name('keranjang.buang');
+    Route::post('/checkout', [KeranjangController::class, 'checkout'])->name('checkout');
+    Route::get('/pembayaran/{id}', [PembayaranController::class, 'show'])->whereNumber('id')->name('pembayaran');
+    Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])->whereNumber('id')->name('pembayaran.bayar');
+    Route::post('/pembayaran/{id}/alamat', [PembayaranController::class, 'alamat'])->whereNumber('id')->name('pembayaran.alamat');
+    Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan');
+    Route::get('/pesanan/{id}', [PesananController::class, 'show'])->whereNumber('id')->name('pesanan.show');
+    Route::get('/pesanan/{id}/invoice', [PesananController::class, 'invoice'])->whereNumber('id')->name('pesanan.invoice');
+    Route::get('/pesanan/{id}/lacak', [PesananController::class, 'lacak'])->whereNumber('id')->name('pesanan.lacak');
+    Route::post('/pesanan/{id}/terima', [PesananController::class, 'terima'])->whereNumber('id')->name('pesanan.terima');
+    Route::get('/lacak', [PesananController::class, 'lacak'])->name('lacak');
+});
 
 Route::middleware(['auth', Peran::class . ':admin,kasir'])->prefix('admin')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/transaksi', [TransaksiController::class, 'index'])->name('admin.transaksi');
+    Route::get('/pengiriman', [PengirimanController::class, 'index'])->name('admin.pengiriman');
+    Route::post('/pengiriman/{id}', [PengirimanController::class, 'ubah'])->whereNumber('id')->name('admin.pengiriman.ubah');
+    Route::post('/transaksi/{id}/lunas', [TransaksiController::class, 'lunas'])->whereNumber('id')->name('admin.transaksi.lunas');
+});
+
+// Data master: khusus admin (kasir hanya transaksi, pembayaran, pengiriman, dan stok masuk)
+Route::middleware(['auth', Peran::class . ':admin,kasir'])->prefix('admin')->group(function () {
+    Route::get('/stok-masuk', [StokMasukController::class, 'index'])->name('admin.stok');
+    Route::post('/stok-masuk', [StokMasukController::class, 'simpan'])->name('admin.stok.simpan');
+});
+
+Route::middleware(['auth', Peran::class . ':admin'])->prefix('admin')->group(function () {
+    Route::get('/produk', [ProdukController::class, 'index'])->name('admin.produk');
+    Route::get('/produk/baru', [ProdukController::class, 'baru'])->name('admin.produk.baru');
+    Route::post('/produk', [ProdukController::class, 'simpan'])->name('admin.produk.simpan');
+    Route::get('/produk/{id}/ubah', [ProdukController::class, 'ubah'])->whereNumber('id')->name('admin.produk.ubah');
+    Route::put('/produk/{id}', [ProdukController::class, 'perbarui'])->whereNumber('id')->name('admin.produk.perbarui');
+    Route::delete('/produk/{id}', [ProdukController::class, 'hapus'])->whereNumber('id')->name('admin.produk.hapus');
+
+    Route::get('/kategori', [KategoriController::class, 'index'])->name('admin.kategori');
+    Route::post('/kategori', [KategoriController::class, 'simpan'])->name('admin.kategori.simpan');
+    Route::put('/kategori/{id}', [KategoriController::class, 'perbarui'])->whereNumber('id')->name('admin.kategori.perbarui');
+    Route::delete('/kategori/{id}', [KategoriController::class, 'hapus'])->whereNumber('id')->name('admin.kategori.hapus');
+
+    Route::get('/supplier', [SupplierController::class, 'index'])->name('admin.supplier');
+    Route::get('/supplier/baru', [SupplierController::class, 'baru'])->name('admin.supplier.baru');
+    Route::post('/supplier', [SupplierController::class, 'simpan'])->name('admin.supplier.simpan');
+    Route::get('/supplier/{id}/ubah', [SupplierController::class, 'ubah'])->whereNumber('id')->name('admin.supplier.ubah');
+    Route::put('/supplier/{id}', [SupplierController::class, 'perbarui'])->whereNumber('id')->name('admin.supplier.perbarui');
+    Route::delete('/supplier/{id}', [SupplierController::class, 'hapus'])->whereNumber('id')->name('admin.supplier.hapus');
 });

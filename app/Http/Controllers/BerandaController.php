@@ -10,9 +10,11 @@ class BerandaController extends Controller
     {
         return view('pelanggan.beranda', [
             'kategori' => DB::table('kategori')->orderBy('id_kategori')->limit(8)->get(),
-            // Rekomendasi sementara: produk tersedia, yang berdiskon didahulukan
-            'produk' => DB::table('produk')->where('stok', '>', 0)
-                ->orderByDesc('diskon')->orderBy('id_produk')->limit(4)->get(),
+            // Rekomendasi sementara: 4 produk terbaru yang stoknya tersedia (semua dari tabel produk)
+            'produk' => DB::table('produk as p')
+                ->leftJoin('kategori as k', 'k.id_kategori', '=', 'p.id_kategori')
+                ->where('p.stok', '>', 0)->orderByDesc('p.id_produk')->limit(4)
+                ->get(['p.*', 'k.nama_kategori']),
         ]);
     }
 }

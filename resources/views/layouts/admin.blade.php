@@ -14,9 +14,24 @@
   <aside class="side">
     <div class="lg"><img src="{{ asset('img/logo.png') }}" alt="Raden Group"><small>Panel Admin</small></div>
     <nav aria-label="Menu admin">
-      <a href="{{ route('admin.dashboard') }}" class="on" aria-current="page"><x-ikon n="grid" /> Dashboard</a>
-      @foreach ([['box', 'Produk & Kategori'], ['download', 'Stok Masuk'], ['download', 'Supplier'], ['cart', 'Transaksi & Pembayaran'], ['truck', 'Pengiriman'], ['file', 'Laporan Penjualan']] as [$ik, $m])
-        <a class="soon" aria-disabled="true" title="Segera hadir"><x-ikon :n="$ik" /> {{ $m }}</a>
+      @php
+        $nav = [
+          ['grid', 'Dashboard', 'admin.dashboard', ['admin.dashboard'], false],
+          ['box', 'Produk & Kategori', 'admin.produk', ['admin.produk*', 'admin.kategori*'], true],
+          ['download', 'Stok Masuk', 'admin.stok', ['admin.stok*'], false],
+          ['download', 'Supplier', 'admin.supplier', ['admin.supplier*'], true],
+          ['cart', 'Transaksi & Pembayaran', 'admin.transaksi', ['admin.transaksi*'], false],
+          ['truck', 'Pengiriman', 'admin.pengiriman', ['admin.pengiriman*'], false],
+          ['file', 'Laporan Penjualan', null, [], true],
+        ];
+      @endphp
+      @foreach ($nav as [$ik, $m, $rt, $pola, $khusus])
+        @continue($khusus && $u->role !== 'admin')
+        @if ($rt)
+          <a href="{{ route($rt) }}" class="{{ request()->routeIs(...$pola) ? 'on' : '' }}" {{ request()->routeIs(...$pola) ? 'aria-current=page' : '' }}><x-ikon :n="$ik" /> {{ $m }}</a>
+        @else
+          <a class="soon" aria-disabled="true" title="Segera hadir"><x-ikon :n="$ik" /> {{ $m }}</a>
+        @endif
       @endforeach
     </nav>
   </aside>
@@ -31,8 +46,9 @@
         </details>
       </div>
     </div>
-    <div class="body">@yield('content')</div>
+    <div class="body">@include('partials.flash')@yield('content')</div>
   </div>
 </div>
+@stack('scripts')
 </body>
 </html>

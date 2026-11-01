@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class DashboardController extends Controller
 {
     private const HARI = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
-    private const BATAS_MENIPIS = 10;
+    private const BATAS_MENIPIS = \App\Support\Stok::BATAS_MENIPIS;
 
     private function lunas()
     {

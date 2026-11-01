@@ -15,22 +15,23 @@
 @endif
 <header class="top"><div class="in">
   <a class="logo" href="/"><img src="{{ asset('img/logo.png') }}" alt="Raden Group"></a>
-  <div class="sr soon" title="Segera hadir" aria-disabled="true">
+  <form id="cari" class="sr" method="get" action="{{ route('katalog') }}" role="search">
     <x-ikon n="search" :s="18" />
-    <span class="t">Cari lemari, kulkas, kasur, dan perabotan lainnya</span>
-    <span class="cam"><x-ikon n="camera" :s="16" /> Cari dengan Kamera</span>
-  </div>
-  <span class="hb navy soon hide" title="Segera hadir">Cari</span>
-  <span class="hb soon hide" title="Segera hadir"><x-ikon n="cart" :s="18" /> Keranjang</span>
+    <input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="Cari lemari, kulkas, kasur, dan perabotan lainnya" aria-label="Cari produk">
+    <span class="cam soon" title="Segera hadir"><x-ikon n="camera" :s="16" /> Cari dengan Kamera</span>
+  </form>
+  <button form="cari" class="hb navy hide">Cari</button>
+  @php $nk = ($u && $u->id_pelanggan) ? (int) \Illuminate\Support\Facades\DB::table('keranjang')->where('id_pelanggan', $u->id_pelanggan)->sum('jumlah') : 0; @endphp
+  <a class="hb hide" href="{{ route('keranjang') }}"><x-ikon n="cart" :s="18" /> Keranjang @if ($nk)<span class="cnt">{{ $nk }}</span>@endif</a>
   @if ($u)
     <span class="hb soon hide" title="Segera hadir"><x-ikon n="phone" :s="18" /> Kontak</span>
-    <span class="chip"><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span>{{ $u->nama }}</span>
+    <a class="chip" href="{{ $u->isStaf() ? route('admin.dashboard') : route('pesanan') }}" title="{{ $u->isStaf() ? 'Dashboard admin' : 'Pesanan saya' }}"><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span>{{ $u->nama }}</a>
     <form method="post" action="{{ route('logout') }}">@csrf<button class="hb">Keluar</button></form>
   @else
     <a class="hb white" href="{{ route('login') }}">Masuk</a>
   @endif
 </div></header>
-<main class="page @yield('page_class')">@yield('content')</main>
+<main class="page @yield('page_class')">@include('partials.flash')@yield('content')</main>
 <footer class="foot"><div class="in"><b>Raden Group</b><span>Jl. Raya Caruban-Ngawi, Desa Karangjati, Kec. Karangjati, Kab. Ngawi, Jawa Timur</span></div></footer>
 @stack('scripts')
 </body>

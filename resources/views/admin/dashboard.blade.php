@@ -7,7 +7,7 @@
   $warna = ['lunas' => 'g', 'selesai' => 'g', 'dikirim' => 'b', 'diproses' => 'b', 'menunggu' => 'y'];
   $lencana = fn ($s) => '<span class="bd ' . ($warna[strtolower($s ?? 'menunggu')] ?? 'b') . '">' . e(ucfirst($s ?? 'Menunggu')) . '</span>';
   $puncak = $grafik->sum('nilai') > 0 ? $grafik->search(fn ($g) => $g['nilai'] === $grafik->max('nilai')) : -1;
-  $ilu = [1 => 'lemari', 4 => 'meja-rias', 5 => 'kulkas', 6 => 'kasur'];
+  $ikon = [1 => 'armchair', 2 => 'pot', 3 => 'home', 4 => 'lamp', 5 => 'monitor', 6 => 'bed', 7 => 'drop', 8 => 'wrench'];
 @endphp
 
 <section class="stats" aria-label="Ringkasan hari ini">
@@ -32,7 +32,7 @@
     <p class="sub">Perlu segera restock</p>
     <ul class="lowl">
       @forelse ($menipis as $p)
-        <li><span class="th"><img src="{{ asset('img/ilustrasi/' . ($ilu[$p->id_kategori] ?? 'lemari') . '.png') }}" alt=""></span><span class="nm">{{ $p->nama_produk }}</span><span class="bd y">Sisa {{ $dua($p->stok) }}</span></li>
+        <li><span class="th"><x-ikon :n="$ikon[$p->id_kategori] ?? 'tag'" :s="20" /></span><span class="nm">{{ $p->nama_produk }}</span><span class="bd y">Sisa {{ $dua($p->stok) }}</span></li>
       @empty
         <li class="empty">Semua stok aman.</li>
       @endforelse

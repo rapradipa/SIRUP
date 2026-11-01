@@ -74,7 +74,7 @@ class DatabaseSeeder extends Seeder
             [56,'Tempat Mainan',70000,10,8,1]
         ] as [$id, $nama, $harga, $stok, $kat, $sup]) {
             DB::table('produk')->insert(['id_produk' => $id, 'nama_produk' => $nama, 'harga' => $harga, 'stok' => $stok,
-                'id_kategori' => $kat, 'id_supplier' => $sup, 'diskon' => in_array($id, [1, 5, 13, 24]) ? 20 : 0]);
+                'id_kategori' => $kat, 'id_supplier' => $sup, 'diskon' => 0]);
         }
 
         // Transaksi contoh (tanggal relatif agar grafik dashboard terisi): [id, hari lalu, pelanggan, karyawan, produk, jumlah, subtotal, bayar, kirim]

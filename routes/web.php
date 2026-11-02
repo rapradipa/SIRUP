@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KontakController;
+use App\Http\Controllers\AlamatController;
+use App\Http\Controllers\AkunController;
 use App\Http\Controllers\BerandaController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KatalogController;
@@ -8,6 +11,8 @@ use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PembayaranController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\Admin\KategoriController;
+use App\Http\Controllers\Admin\LaporanController;
+use App\Http\Controllers\Admin\PenggunaController;
 use App\Http\Controllers\Admin\PengirimanController;
 use App\Http\Controllers\Admin\ProdukController;
 use App\Http\Controllers\Admin\StokMasukController;
@@ -23,6 +28,7 @@ Route::get('/', function () {
 
 // Beranda pelanggan: tanpa login
 Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
+Route::get('/kontak', [KontakController::class, 'index'])->name('kontak');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
 Route::get('/produk/{id}', [KatalogController::class, 'show'])->whereNumber('id')->name('produk');
 
@@ -35,6 +41,17 @@ Route::middleware('guest')->group(function () {
 Route::post('/keluar', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::middleware(['auth', Peran::class . ':pelanggan'])->group(function () {
+    Route::get('/akun', [AkunController::class, 'profil'])->name('akun');
+    Route::get('/akun/ubah', [AkunController::class, 'ubah'])->name('akun.ubah');
+    Route::put('/akun/ubah', [AkunController::class, 'perbarui'])->name('akun.perbarui');
+    Route::put('/akun/sandi', [AkunController::class, 'sandi'])->name('akun.sandi');
+    Route::get('/akun/alamat', [AlamatController::class, 'index'])->name('akun.alamat');
+    Route::get('/akun/alamat/baru', [AlamatController::class, 'baru'])->name('akun.alamat.baru');
+    Route::post('/akun/alamat', [AlamatController::class, 'simpan'])->name('akun.alamat.simpan');
+    Route::get('/akun/alamat/{id}/ubah', [AlamatController::class, 'ubah'])->whereNumber('id')->name('akun.alamat.ubah');
+    Route::put('/akun/alamat/{id}', [AlamatController::class, 'perbarui'])->whereNumber('id')->name('akun.alamat.perbarui');
+    Route::post('/akun/alamat/{id}/utama', [AlamatController::class, 'utama'])->whereNumber('id')->name('akun.alamat.utama');
+    Route::delete('/akun/alamat/{id}', [AlamatController::class, 'hapus'])->whereNumber('id')->name('akun.alamat.hapus');
     Route::get('/keranjang', [KeranjangController::class, 'index'])->name('keranjang');
     Route::post('/keranjang', [KeranjangController::class, 'tambah'])->name('keranjang.tambah');
     Route::post('/keranjang/hapus', [KeranjangController::class, 'hapus'])->name('keranjang.hapus');
@@ -78,6 +95,15 @@ Route::middleware(['auth', Peran::class . ':admin'])->prefix('admin')->group(fun
     Route::post('/kategori', [KategoriController::class, 'simpan'])->name('admin.kategori.simpan');
     Route::put('/kategori/{id}', [KategoriController::class, 'perbarui'])->whereNumber('id')->name('admin.kategori.perbarui');
     Route::delete('/kategori/{id}', [KategoriController::class, 'hapus'])->whereNumber('id')->name('admin.kategori.hapus');
+
+    Route::get('/pengguna', [PenggunaController::class, 'index'])->name('admin.pengguna');
+    Route::get('/pengguna/baru', [PenggunaController::class, 'baru'])->name('admin.pengguna.baru');
+    Route::post('/pengguna', [PenggunaController::class, 'simpan'])->name('admin.pengguna.simpan');
+    Route::put('/pengguna/{id}/sandi', [PenggunaController::class, 'sandi'])->whereNumber('id')->name('admin.pengguna.sandi');
+    Route::delete('/pengguna/{id}', [PenggunaController::class, 'hapus'])->whereNumber('id')->name('admin.pengguna.hapus');
+
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('admin.laporan');
+    Route::get('/laporan/csv', [LaporanController::class, 'csv'])->name('admin.laporan.csv');
 
     Route::get('/supplier', [SupplierController::class, 'index'])->name('admin.supplier');
     Route::get('/supplier/baru', [SupplierController::class, 'baru'])->name('admin.supplier.baru');

@@ -22,7 +22,8 @@
           ['download', 'Supplier', 'admin.supplier', ['admin.supplier*'], true],
           ['cart', 'Transaksi & Pembayaran', 'admin.transaksi', ['admin.transaksi*'], false],
           ['truck', 'Pengiriman', 'admin.pengiriman', ['admin.pengiriman*'], false],
-          ['file', 'Laporan Penjualan', null, [], true],
+          ['file', 'Laporan Penjualan', 'admin.laporan', ['admin.laporan*'], true],
+          ['user', 'Pengguna', 'admin.pengguna', ['admin.pengguna*'], true],
         ];
       @endphp
       @foreach ($nav as [$ik, $m, $rt, $pola, $khusus])

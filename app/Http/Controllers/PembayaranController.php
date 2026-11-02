@@ -24,7 +24,8 @@ class PembayaranController extends Controller
         $items = DB::table('detail_transaksi as d')->join('produk as p', 'p.id_produk', '=', 'd.id_produk')
             ->where('d.id_transaksi', $id)->get(['d.jumlah', 'd.subtotal', 'p.nama_produk', 'p.id_kategori', 'p.gambar']);
         $g = DB::table('pengiriman')->where('id_transaksi', $id)->first();
-        return view('pelanggan.pembayaran', compact('t', 'items', 'g'));
+        $tersimpan = DB::table('alamat')->where('id_pelanggan', auth()->user()->id_pelanggan)->orderByDesc('utama')->orderBy('id_alamat')->get();
+        return view('pelanggan.pembayaran', compact('t', 'items', 'g', 'tersimpan'));
     }
 
     public function bayar(Request $r, int $id)

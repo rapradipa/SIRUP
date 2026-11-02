@@ -7,6 +7,7 @@
   $lunas = strtolower($t->status_pembayaran) === 'lunas';
   $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'ewallet' => 'E-Wallet'];
   $kode = 'TRX-' . str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT);
+  $d0 = $tersimpan->first();
   $stg = ['diproses' => ['b', 'Diproses'], 'dikirim' => ['b', 'Dikirim'], 'selesai' => ['g', 'Selesai'], 'menunggu' => ['y', 'Menunggu']];
 @endphp
 <div class="wrap">
@@ -49,23 +50,33 @@
       <form id="fa" class="panel" method="post" action="{{ route('pembayaran.alamat', $t->id_transaksi) }}">
         @csrf
         <h2>Alamat Pengiriman</h2>
+        @if ($tersimpan->count())
+          <div class="f" style="margin-top:12px"><label for="pilih">Pakai alamat tersimpan</label>
+            <select id="pilih">
+              <option value="">Isi alamat baru</option>
+              @foreach ($tersimpan as $a)
+                <option value="{{ $a->id_alamat }}" data-nama="{{ $a->nama_penerima }}" data-telp="{{ $a->no_telp }}" data-alamat="{{ $a->alamat }}" data-kota="{{ $a->kota }}" data-pos="{{ $a->kode_pos }}" @selected($loop->first && ! old('alamat'))>{{ $a->label }}{{ $a->utama ? ' (Utama)' : '' }} - {{ \Illuminate\Support\Str::limit($a->alamat, 40) }}</option>
+              @endforeach
+            </select>
+          </div>
+        @endif
         <div class="fg2">
           <div class="f"><label for="nama_penerima">Nama penerima</label>
-            <input type="text" id="nama_penerima" name="nama_penerima" value="{{ old('nama_penerima', auth()->user()->nama) }}" placeholder="Nama penerima" required class="{{ $errors->has('nama_penerima') ? 'bad' : '' }}">
+            <input type="text" id="nama_penerima" name="nama_penerima" value="{{ old('nama_penerima', $d0->nama_penerima ?? auth()->user()->nama) }}" placeholder="Nama penerima" required class="{{ $errors->has('nama_penerima') ? 'bad' : '' }}">
             @error('nama_penerima')<div class="err">{{ $message }}</div>@enderror</div>
           <div class="f"><label for="no_telp_penerima">Nomor telepon</label>
-            <input type="text" id="no_telp_penerima" name="no_telp_penerima" value="{{ old('no_telp_penerima', auth()->user()->no_telp) }}" inputmode="numeric" placeholder="08xxxxxxxxxx" required class="{{ $errors->has('no_telp_penerima') ? 'bad' : '' }}">
+            <input type="text" id="no_telp_penerima" name="no_telp_penerima" value="{{ old('no_telp_penerima', $d0->no_telp ?? auth()->user()->no_telp) }}" inputmode="numeric" placeholder="08xxxxxxxxxx" required class="{{ $errors->has('no_telp_penerima') ? 'bad' : '' }}">
             @error('no_telp_penerima')<div class="err">{{ $message }}</div>@enderror</div>
         </div>
         <div class="f"><label for="alamat">Alamat lengkap</label>
-          <textarea id="alamat" name="alamat" rows="3" placeholder="Jalan, nomor rumah, RT/RW, desa/kelurahan" required class="{{ $errors->has('alamat') ? 'bad' : '' }}">{{ old('alamat') }}</textarea>
+          <textarea id="alamat" name="alamat" rows="3" placeholder="Jalan, nomor rumah, RT/RW, desa/kelurahan" required class="{{ $errors->has('alamat') ? 'bad' : '' }}">{{ old('alamat', $d0->alamat ?? '') }}</textarea>
           @error('alamat')<div class="err">{{ $message }}</div>@enderror</div>
         <div class="fg2">
           <div class="f"><label for="kota">Kota / Kabupaten</label>
-            <input type="text" id="kota" name="kota" value="{{ old('kota') }}" placeholder="Kota / Kabupaten" required class="{{ $errors->has('kota') ? 'bad' : '' }}">
+            <input type="text" id="kota" name="kota" value="{{ old('kota', $d0->kota ?? '') }}" placeholder="Kota / Kabupaten" required class="{{ $errors->has('kota') ? 'bad' : '' }}">
             @error('kota')<div class="err">{{ $message }}</div>@enderror</div>
           <div class="f"><label for="kode_pos">Kode pos</label>
-            <input type="text" id="kode_pos" name="kode_pos" value="{{ old('kode_pos') }}" inputmode="numeric" maxlength="5" placeholder="Kode pos" required class="{{ $errors->has('kode_pos') ? 'bad' : '' }}">
+            <input type="text" id="kode_pos" name="kode_pos" value="{{ old('kode_pos', $d0->kode_pos ?? '') }}" inputmode="numeric" maxlength="5" placeholder="Kode pos" required class="{{ $errors->has('kode_pos') ? 'bad' : '' }}">
             @error('kode_pos')<div class="err">{{ $message }}</div>@enderror</div>
         </div>
         <div class="acts">
@@ -99,3 +110,13 @@
   </div>
 </div>
 @endsection
+@push('scripts')
+<script>
+const pilih = document.getElementById('pilih');
+if (pilih) pilih.addEventListener('change', () => {
+  const o = pilih.selectedOptions[0], set = (id, v) => document.getElementById(id).value = v || '';
+  set('nama_penerima', o.dataset.nama); set('no_telp_penerima', o.dataset.telp); set('alamat', o.dataset.alamat);
+  set('kota', o.dataset.kota); set('kode_pos', o.dataset.pos);
+});
+</script>
+@endpush

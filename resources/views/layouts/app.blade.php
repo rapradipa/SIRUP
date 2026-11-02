@@ -22,17 +22,17 @@
   </form>
   <button form="cari" class="hb navy hide">Cari</button>
   @php $nk = ($u && $u->id_pelanggan) ? (int) \Illuminate\Support\Facades\DB::table('keranjang')->where('id_pelanggan', $u->id_pelanggan)->sum('jumlah') : 0; @endphp
-  <a class="hb hide" href="{{ route('keranjang') }}"><x-ikon n="cart" :s="18" /> Keranjang @if ($nk)<span class="cnt">{{ $nk }}</span>@endif</a>
+  <a class="hb" href="{{ route('keranjang') }}"><x-ikon n="cart" :s="18" /><span class="lb">Keranjang</span> @if ($nk)<span class="cnt">{{ $nk }}</span>@endif</a>
   @if ($u)
-    <span class="hb soon hide" title="Segera hadir"><x-ikon n="phone" :s="18" /> Kontak</span>
-    <a class="chip" href="{{ $u->isStaf() ? route('admin.dashboard') : route('pesanan') }}" title="{{ $u->isStaf() ? 'Dashboard admin' : 'Pesanan saya' }}"><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span>{{ $u->nama }}</a>
+    <a class="hb" href="{{ route('kontak') }}"><x-ikon n="phone" :s="18" /><span class="lb">Kontak</span></a>
+    <a class="chip" href="{{ $u->isStaf() ? route('admin.dashboard') : route('akun') }}" title="{{ $u->isStaf() ? 'Dashboard admin' : 'Akun saya' }}"><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span><span class="lb">{{ $u->nama }}</span></a>
     <form method="post" action="{{ route('logout') }}">@csrf<button class="hb">Keluar</button></form>
   @else
     <a class="hb white" href="{{ route('login') }}">Masuk</a>
   @endif
 </div></header>
 <main class="page @yield('page_class')">@include('partials.flash')@yield('content')</main>
-<footer class="foot"><div class="in"><b>Raden Group</b><span>Jl. Raya Caruban-Ngawi, Desa Karangjati, Kec. Karangjati, Kab. Ngawi, Jawa Timur</span></div></footer>
+<footer class="foot"><div class="in"><b>Raden Group</b><span>Jl. Raya Caruban-Ngawi, Desa Karangjati, Kec. Karangjati, Kab. Ngawi, Jawa Timur &middot; <a href="{{ route('kontak') }}" style="text-decoration:underline">Kontak Kami</a></span></div></footer>
 @stack('scripts')
 </body>
 </html>

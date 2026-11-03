@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KatalogController;
 use App\Http\Controllers\KeranjangController;
 use App\Http\Controllers\PembayaranController;
+use App\Http\Controllers\PencarianVisualController;
 use App\Http\Controllers\PesananController;
 use App\Http\Controllers\Admin\KategoriController;
 use App\Http\Controllers\Admin\LaporanController;
@@ -29,6 +30,8 @@ Route::get('/', function () {
 // Beranda pelanggan: tanpa login
 Route::get('/beranda', [BerandaController::class, 'index'])->name('beranda');
 Route::get('/kontak', [KontakController::class, 'index'])->name('kontak');
+Route::get('/cari-foto', [PencarianVisualController::class, 'index'])->name('cari.foto');
+Route::post('/cari-foto', [PencarianVisualController::class, 'proses'])->middleware('throttle:8,1')->name('cari.foto.proses');
 Route::get('/katalog', [KatalogController::class, 'index'])->name('katalog');
 Route::get('/produk/{id}', [KatalogController::class, 'show'])->whereNumber('id')->name('produk');
 

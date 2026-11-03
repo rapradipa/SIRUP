@@ -214,3 +214,17 @@ td.aks form{margin:0}
 .faq details[open] summary svg{transform:rotate(90deg)}.faq p{margin:8px 0 0;color:var(--mu)}
 @media(max-width:1000px){.ak,.kt-g{grid-template-columns:1fr}.akm nav{display:flex;flex-wrap:wrap;gap:4px}.akm nav form{margin:0;padding:0;border:0}.tiles{grid-template-columns:1fr 1fr}.fg3,.bio{grid-template-columns:1fr}}
 @media(max-width:560px){.sr .cam{display:none}.al-a{margin-left:0;width:100%}}
+
+/* pencarian foto (AI) */
+.vs{display:grid;grid-template-columns:1fr 1.1fr;background:#fff;border:1px solid var(--line);border-radius:24px;overflow:hidden}
+.vs .l{background:var(--soft);padding:28px}.vs .rr{padding:28px;min-width:0}.vs h2{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
+.dz{border:2px dashed #9db8f5;border-radius:16px;min-height:260px;display:grid;place-items:center;background:#fff;text-align:center;padding:14px;margin-top:14px;color:var(--blue);overflow:hidden}
+.dz img{max-width:100%;max-height:300px;object-fit:contain;border-radius:10px}.dz p{margin:8px 0 0;color:var(--tx)}
+.vbtn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.vbtn .btn{cursor:pointer}
+#det{display:inline-block;margin:6px 0 14px}
+.vr{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#fff}.vr:hover{border-color:var(--blue)}
+.vr.top{border:2px solid var(--blue)}.vr b{font-size:14.5px}.vm{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.vr .pr{font-size:16px}
+.sr .cam{cursor:pointer}
+@media(max-width:1000px){.vs{grid-template-columns:1fr}.vs .l,.vs .rr{padding:20px}}
+
+[hidden]{display:none!important}

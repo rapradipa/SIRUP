@@ -18,7 +18,7 @@
   <form id="cari" class="sr" method="get" action="{{ route('katalog') }}" role="search">
     <x-ikon n="search" :s="18" />
     <input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="Cari lemari, kulkas, kasur, dan perabotan lainnya" aria-label="Cari produk">
-    <span class="cam soon" title="Segera hadir"><x-ikon n="camera" :s="16" /> Cari dengan Kamera</span>
+    <a class="cam" href="{{ route('cari.foto') }}"><x-ikon n="camera" :s="16" /> Cari dengan Kamera</a>
   </form>
   <button form="cari" class="hb navy hide">Cari</button>
   @php $nk = ($u && $u->id_pelanggan) ? (int) \Illuminate\Support\Facades\DB::table('keranjang')->where('id_pelanggan', $u->id_pelanggan)->sum('jumlah') : 0; @endphp

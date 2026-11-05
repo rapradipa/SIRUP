@@ -228,3 +228,6 @@ td.aks form{margin:0}
 @media(max-width:1000px){.vs{grid-template-columns:1fr}.vs .l,.vs .rr{padding:20px}}
 
 [hidden]{display:none!important}
+
+/* ikon aksi */
+td.aks{gap:8px}.ib2.pri{background:var(--blue);color:#fff}a.ib2:hover{filter:brightness(.93)}

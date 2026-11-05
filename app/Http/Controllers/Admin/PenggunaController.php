@@ -41,11 +41,25 @@ class PenggunaController extends Controller
         return redirect()->route('admin.pengguna')->with('ok', "Akun {$d['role']} \"{$d['nama']}\" dibuat.");
     }
 
+    public function show(int $id)
+    {
+        $a = DB::table('akun as a')
+            ->leftJoin('karyawan as k', 'k.id_karyawan', '=', 'a.id_karyawan')
+            ->leftJoin('pelanggan as p', 'p.id_pelanggan', '=', 'a.id_pelanggan')
+            ->where('a.id_akun', $id)
+            ->first(['a.id_akun', 'a.no_telp', 'a.role', DB::raw('COALESCE(k.nama, p.nama) as nama')]);
+        abort_if(! $a, 404);
+        return view('admin.pengguna_detail', compact('a'));
+    }
+
     public function sandi(Request $r, int $id)
     {
-        $d = $r->validate(['password' => 'required|string|min:8|max:72'], ['required' => 'Isi kata sandi baru.', 'min' => 'Kata sandi minimal 8 karakter.']);
-        Akun::where('id_akun', $id)->firstOrFail()->update(['password' => $d['password']]);
-        return back()->with('ok', 'Kata sandi akun diatur ulang.');
+        $akun = Akun::where('id_akun', $id)->firstOrFail();
+        $d = $r->validate(['password' => 'required|string|min:8|max:72|confirmed'], [
+            'required' => 'Isi kata sandi baru.', 'min' => 'Kata sandi minimal 8 karakter.', 'confirmed' => 'Konfirmasi kata sandi tidak sama.',
+        ]);
+        $akun->update(['password' => $d['password']]);
+        return redirect()->route('admin.pengguna.show', $id)->with('ok', 'Kata sandi akun berhasil diubah.');
     }
 
     public function hapus(int $id)

@@ -19,7 +19,7 @@
           ['grid', 'Dashboard', 'admin.dashboard', ['admin.dashboard'], false],
           ['box', 'Produk & Kategori', 'admin.produk', ['admin.produk*', 'admin.kategori*'], true],
           ['download', 'Stok Masuk', 'admin.stok', ['admin.stok*'], false],
-          ['download', 'Supplier', 'admin.supplier', ['admin.supplier*'], true],
+          ['store', 'Supplier', 'admin.supplier', ['admin.supplier*'], true],
           ['cart', 'Transaksi & Pembayaran', 'admin.transaksi', ['admin.transaksi*'], false],
           ['truck', 'Pengiriman', 'admin.pengiriman', ['admin.pengiriman*'], false],
           ['file', 'Laporan Penjualan', 'admin.laporan', ['admin.laporan*'], true],

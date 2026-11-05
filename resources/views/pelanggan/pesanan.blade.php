@@ -47,14 +47,14 @@
             <td>@if ($sg !== '')<span class="bd {{ $stg[$sg][0] ?? 'b' }}">{{ $stg[$sg][1] ?? ucfirst($sg) }}</span>@else - @endif</td>
             <td class="aks">
               @if (! $lunas)
-                <a class="lnk" href="{{ route('pembayaran', $p->id_transaksi) }}">Bayar</a>
+                <a class="ib2 pri" href="{{ route('pembayaran', $p->id_transaksi) }}" title="Bayar" aria-label="Bayar"><x-ikon n="card" :s="16" /></a>
               @else
-                <a class="lnk" href="{{ route('pesanan.show', $p->id_transaksi) }}">Detail</a>
-                <a class="lnk" href="{{ route('pesanan.invoice', $p->id_transaksi) }}" target="_blank" rel="noopener">Invoice</a>
+                <a class="ib2" href="{{ route('pesanan.show', $p->id_transaksi) }}" title="Detail" aria-label="Detail"><x-ikon n="eye" :s="16" /></a>
+                <a class="ib2" href="{{ route('pesanan.invoice', $p->id_transaksi) }}" target="_blank" rel="noopener" title="Invoice" aria-label="Invoice"><x-ikon n="file" :s="16" /></a>
                 @if ($sg === '')
-                  <a class="lnk" href="{{ route('pembayaran', $p->id_transaksi) }}">Atur pengiriman</a>
+                  <a class="ib2 pri" href="{{ route('pembayaran', $p->id_transaksi) }}" title="Atur pengiriman" aria-label="Atur pengiriman"><x-ikon n="pin" :s="16" /></a>
                 @elseif (($p->jenis ?? 'kirim') !== 'ambil')
-                  <a class="lnk" href="{{ route('pesanan.lacak', $p->id_transaksi) }}">Lacak</a>
+                  <a class="ib2" href="{{ route('pesanan.lacak', $p->id_transaksi) }}" title="Lacak pengiriman" aria-label="Lacak pengiriman"><x-ikon n="truck" :s="16" /></a>
                 @endif
               @endif
             </td>

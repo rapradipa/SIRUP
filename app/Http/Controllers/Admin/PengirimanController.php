@@ -22,6 +22,20 @@ class PengirimanController extends Controller
         return view('admin.pengiriman', compact('kirim'));
     }
 
+    public function show(int $id)
+    {
+        $g = DB::table('pengiriman as g')
+            ->join('transaksi as t', 't.id_transaksi', '=', 'g.id_transaksi')
+            ->join('pelanggan as p', 'p.id_pelanggan', '=', 't.id_pelanggan')
+            ->where('g.id_transaksi', $id)
+            ->first(['g.*', 't.tanggal', 't.total', 'p.nama as pelanggan', 'p.no_telp as telp_pelanggan']);
+        abort_if(! $g, 404);
+        $items = DB::table('detail_transaksi as d')->join('produk as p', 'p.id_produk', '=', 'd.id_produk')
+            ->where('d.id_transaksi', $id)->orderBy('d.id_detail')->get(['d.jumlah', 'd.subtotal', 'p.nama_produk']);
+        $log = DB::table('pengiriman_log')->where('id_transaksi', $id)->orderByDesc('id_log')->get();
+        return view('admin.pengiriman_detail', compact('g', 'items', 'log'));
+    }
+
     public function ubah(Request $r, int $id, PengirimanService $layanan)
     {
         $aksi = $r->input('aksi');

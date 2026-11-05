@@ -26,7 +26,6 @@
   @if ($u)
     <a class="hb" href="{{ route('kontak') }}"><x-ikon n="phone" :s="18" /><span class="lb">Kontak</span></a>
     <a class="chip" href="{{ $u->isStaf() ? route('admin.dashboard') : route('akun') }}" title="{{ $u->isStaf() ? 'Dashboard admin' : 'Akun saya' }}"><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span><span class="lb">{{ $u->nama }}</span></a>
-    <form method="post" action="{{ route('logout') }}">@csrf<button class="hb">Keluar</button></form>
   @else
     <a class="hb white" href="{{ route('login') }}">Masuk</a>
   @endif

@@ -76,6 +76,7 @@ Route::middleware(['auth', Peran::class . ':admin,kasir'])->prefix('admin')->gro
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/transaksi', [TransaksiController::class, 'index'])->name('admin.transaksi');
     Route::get('/pengiriman', [PengirimanController::class, 'index'])->name('admin.pengiriman');
+    Route::get('/pengiriman/{id}', [PengirimanController::class, 'show'])->whereNumber('id')->name('admin.pengiriman.show');
     Route::post('/pengiriman/{id}', [PengirimanController::class, 'ubah'])->whereNumber('id')->name('admin.pengiriman.ubah');
     Route::post('/transaksi/{id}/lunas', [TransaksiController::class, 'lunas'])->whereNumber('id')->name('admin.transaksi.lunas');
 });
@@ -102,6 +103,7 @@ Route::middleware(['auth', Peran::class . ':admin'])->prefix('admin')->group(fun
     Route::get('/pengguna', [PenggunaController::class, 'index'])->name('admin.pengguna');
     Route::get('/pengguna/baru', [PenggunaController::class, 'baru'])->name('admin.pengguna.baru');
     Route::post('/pengguna', [PenggunaController::class, 'simpan'])->name('admin.pengguna.simpan');
+    Route::get('/pengguna/{id}', [PenggunaController::class, 'show'])->whereNumber('id')->name('admin.pengguna.show');
     Route::put('/pengguna/{id}/sandi', [PenggunaController::class, 'sandi'])->whereNumber('id')->name('admin.pengguna.sandi');
     Route::delete('/pengguna/{id}', [PenggunaController::class, 'hapus'])->whereNumber('id')->name('admin.pengguna.hapus');
 

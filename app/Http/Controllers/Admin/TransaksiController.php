@@ -15,7 +15,7 @@ class TransaksiController extends Controller
             ->join('pelanggan as p', 'p.id_pelanggan', '=', 't.id_pelanggan')
             ->leftJoin('pembayaran as b', 'b.id_transaksi', '=', 't.id_transaksi')
             ->orderByDesc('t.id_transaksi')
-            ->paginate(12, ['t.id_transaksi', 't.tanggal', 't.total', 'p.nama', 'b.status_pembayaran', 'b.metode']);
+            ->paginate(12, ['t.id_transaksi', 't.tanggal', 't.total', 'p.nama', 'b.status_pembayaran', 'b.metode', 'b.bank', 'b.bukti']);
         return view('admin.transaksi', compact('transaksi'));
     }
 

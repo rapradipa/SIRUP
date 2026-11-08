@@ -18,7 +18,7 @@ class KontakController extends Controller
         $faq = [
             ['Bagaimana cara melacak pesanan?', 'Buka Pesanan Saya, lalu klik Lacak pada pesanan yang sudah dikirim. Anda juga bisa memasukkan nomor transaksi atau nomor resi di halaman Lacak Pengiriman.'],
             ['Bagaimana cara mengubah alamat?', 'Alamat pengiriman diisi setelah pembayaran lunas dan tidak dapat diubah sendiri setelah disimpan. Hubungi kami lewat WhatsApp secepatnya agar pesanan belum dikirim. Untuk pesanan berikutnya, simpan alamat Anda di menu Daftar Alamat.'],
-            ['Bagaimana cara membayar?', 'Setelah checkout, pilih metode pembayaran (tunai di toko, transfer bank, atau e-wallet). Kasir akan memverifikasi pembayaran Anda, lalu status pesanan berubah menjadi Lunas.'],
+            ['Bagaimana cara membayar?', 'Setelah checkout, pilih metode pembayaran (tunai di toko, transfer bank, atau QRIS). Untuk QRIS, pindai kode yang tampil lalu kirim bukti pembayaran. Kasir akan memverifikasi pembayaran Anda, lalu status pesanan berubah menjadi Lunas.'],
         ];
         return view('pelanggan.kontak', [
             'toko' => config('toko'), 'wa' => $wa, 'topik' => $topik, 'faq' => $faq,

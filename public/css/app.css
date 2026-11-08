@@ -143,9 +143,11 @@ td{padding:15px 16px;border-bottom:1px solid #e8eefb;font-size:13px}td:first-chi
 .sm .btn{margin-top:14px}.btn[disabled]{cursor:not-allowed}
 .rad{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:10px;font-weight:700;cursor:pointer}
 .rad:has(input:checked){border-color:var(--blue);background:var(--soft)}.rad input{accent-color:var(--blue);width:18px;height:18px;margin:0}
-.note{background:var(--soft);color:var(--blue);border-radius:12px;padding:12px 14px;margin-top:6px;font-size:13px;font-weight:600}.note.y{background:#fff1d6;color:var(--amb)}
+.subbank{margin:-2px 0 14px 28px;display:grid;gap:8px}
+.subbank .rad{padding:10px 14px;margin-bottom:0;font-weight:600;font-size:13.5px}
+.note{background:var(--soft);color:var(--blue);border-radius:12px;padding:12px 14px;margin-top:6px;font-size:13px;font-weight:600}.note.y{background:#fff1d6;color:var(--amb)}.note.g{background:#e3f6ea;color:var(--grn)}
 .banner{background:#e1f6ec;color:var(--grn);border-radius:14px;padding:16px 20px;margin-bottom:20px;display:flex;flex-direction:column;gap:2px}.banner b{font-size:17px}
-@media(max-width:1000px){.cg{grid-template-columns:1fr}}
+@media(max-width:1000px){.cg{grid-template-columns:1fr}.cg-sum-first>aside{order:-1;margin-bottom:20px}}
 @media(max-width:560px){.ci{flex-wrap:wrap}.pt{font-size:24px}}
 
 /* minggu 4: riwayat, invoice, lacak */

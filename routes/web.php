@@ -64,6 +64,7 @@ Route::middleware(['auth', Peran::class . ':pelanggan'])->group(function () {
     Route::get('/pembayaran/{id}', [PembayaranController::class, 'show'])->whereNumber('id')->name('pembayaran');
     Route::post('/pembayaran/{id}', [PembayaranController::class, 'bayar'])->whereNumber('id')->name('pembayaran.bayar');
     Route::post('/pembayaran/{id}/alamat', [PembayaranController::class, 'alamat'])->whereNumber('id')->name('pembayaran.alamat');
+    Route::post('/pembayaran/{id}/bukti', [PembayaranController::class, 'bukti'])->whereNumber('id')->name('pembayaran.bukti');
     Route::get('/pesanan', [PesananController::class, 'index'])->name('pesanan');
     Route::get('/pesanan/{id}', [PesananController::class, 'show'])->whereNumber('id')->name('pesanan.show');
     Route::get('/pesanan/{id}/invoice', [PesananController::class, 'invoice'])->whereNumber('id')->name('pesanan.invoice');

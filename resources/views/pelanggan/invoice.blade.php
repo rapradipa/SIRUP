@@ -8,7 +8,9 @@
   $noInv = 'INV/' . $tgl->format('Ymd') . '/RDN/' . str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT);
   $lunas = strtolower($t->status_pembayaran ?? '') === 'lunas';
   $rp = fn ($n) => 'Rp' . number_format($n, 0, ',', '.');
-  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'ewallet' => 'E-Wallet'];
+  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'qris' => 'QRIS'];
+  $bankLabel = ['bri' => 'BRI', 'mandiri' => 'Mandiri'];
+  $namaMetode = ($metode[$t->metode] ?? ($t->metode ?: '-')) . ($t->metode === 'transfer' && ! empty($t->bank) ? ' (' . ($bankLabel[$t->bank] ?? $t->bank) . ')' : '');
   $ambil = ($t->jenis ?? '') === 'ambil';
   $jumlahBarang = $items->sum('jumlah');
   $adaDiskon = $items->contains(fn ($i) => $i->diskon > 0);
@@ -73,7 +75,7 @@
         @if ($lunas && $t->dibayar_pada)
           <dt>Tanggal Pembayaran</dt><dd>{{ $tanggalId($t->dibayar_pada) }}</dd>
         @endif
-        <dt>Metode Pembayaran</dt><dd>{{ $metode[$t->metode] ?? ($t->metode ?: '-') }}</dd>
+        <dt>Metode Pembayaran</dt><dd>{{ $namaMetode }}</dd>
       </dl>
     </div>
     <div>
@@ -118,7 +120,7 @@
   </div>
 
   <div class="bayar">
-    <span>Metode Pembayaran: <b>{{ $metode[$t->metode] ?? ($t->metode ?: '-') }}</b></span>
+    <span>Metode Pembayaran: <b>{{ $namaMetode }}</b></span>
     <span>Status: <b>{{ $lunas ? 'Lunas' : 'Menunggu pembayaran' }}</b></span>
   </div>
 

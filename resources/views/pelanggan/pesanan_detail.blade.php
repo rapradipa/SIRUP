@@ -8,7 +8,9 @@
   $lunas = strtolower($t->status_pembayaran ?? '') === 'lunas';
   $sg = strtolower($t->status_pengiriman ?? '');
   $stg = ['diproses' => ['b', 'Diproses'], 'dikirim' => ['b', 'Dikirim'], 'selesai' => ['g', 'Selesai'], 'menunggu' => ['y', 'Menunggu']];
-  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'ewallet' => 'E-Wallet'];
+  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'qris' => 'QRIS'];
+  $bankLabel = ['bri' => 'BRI', 'mandiri' => 'Mandiri'];
+  $namaMetode = ($metode[$t->metode] ?? ($t->metode ?: '-')) . ($t->metode === 'transfer' && ! empty($t->bank) ? ' (' . ($bankLabel[$t->bank] ?? $t->bank) . ')' : '');
   $adaDiskon = $items->contains(fn ($i) => $i->diskon > 0);
   $daftar = $items->sum(fn ($i) => $i->harga * $i->jumlah);
 @endphp
@@ -58,9 +60,12 @@
     <div style="display:grid;gap:20px">
       <aside class="panel sm">
         <div class="rw"><h2>Pembayaran</h2><span class="bd {{ $lunas ? 'g' : 'y' }}">{{ $lunas ? 'Lunas' : 'Menunggu' }}</span></div>
-        <div class="rw"><span>Metode</span><b>{{ $metode[$t->metode] ?? ($t->metode ?: '-') }}</b></div>
+        <div class="rw"><span>Metode</span><b>{{ $namaMetode }}</b></div>
         <div class="rw"><span>Jumlah {{ $lunas ? 'dibayar' : 'tagihan' }}</span><b>{{ $rp($t->dibayar ?? $t->total) }}</b></div>
         <div class="rw"><span>Tanggal bayar</span><b>{{ $t->dibayar_pada ? \Illuminate\Support\Carbon::parse($t->dibayar_pada)->format('d/m/Y') : '-' }}</b></div>
+        @if (! empty($t->bukti))
+          <p class="mu noprint" style="margin-top:6px"><a class="lnk" href="{{ asset('uploads/bukti/' . $t->bukti) }}" target="_blank" rel="noopener">Lihat bukti pembayaran yang dikirim</a></p>
+        @endif
         @unless ($lunas)
           <a class="btn full noprint" href="{{ route('pembayaran', $t->id_transaksi) }}">Bayar Sekarang</a>
         @endunless

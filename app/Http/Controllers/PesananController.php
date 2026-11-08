@@ -66,7 +66,7 @@ class PesananController extends Controller
 
     public function show(int $id)
     {
-        $t = $this->dasar()->where('t.id_transaksi', $id)->first(['t.*', 'b.status_pembayaran', 'b.metode', 'b.jumlah as dibayar', 'b.dibayar_pada',
+        $t = $this->dasar()->where('t.id_transaksi', $id)->first(['t.*', 'b.status_pembayaran', 'b.metode', 'b.bank', 'b.bukti', 'b.jumlah as dibayar', 'b.dibayar_pada',
             'g.status_pengiriman', 'g.jenis', 'g.alamat_pengiriman', 'g.nama_penerima', 'g.no_telp_penerima', 'g.no_resi']);
         abort_if(! $t, 404);
         $items = DB::table('detail_transaksi as d')->join('produk as p', 'p.id_produk', '=', 'd.id_produk')
@@ -76,7 +76,7 @@ class PesananController extends Controller
 
     public function invoice(int $id)
     {
-        $t = $this->dasar()->where('t.id_transaksi', $id)->first(['t.*', 'b.status_pembayaran', 'b.metode', 'b.dibayar_pada',
+        $t = $this->dasar()->where('t.id_transaksi', $id)->first(['t.*', 'b.status_pembayaran', 'b.metode', 'b.bank', 'b.dibayar_pada',
             'g.jenis', 'g.alamat_pengiriman', 'g.nama_penerima', 'g.no_telp_penerima', 'g.kurir', 'g.no_resi']);
         abort_if(! $t, 404);
         $items = DB::table('detail_transaksi as d')->join('produk as p', 'p.id_produk', '=', 'd.id_produk')

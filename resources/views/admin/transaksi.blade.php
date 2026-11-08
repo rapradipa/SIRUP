@@ -3,7 +3,9 @@
 @section('content')
 @php
   $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
-  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'ewallet' => 'E-Wallet'];
+  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'qris' => 'QRIS'];
+  $bankLabel = ['bri' => 'BRI', 'mandiri' => 'Mandiri'];
+  $namaMetode = fn ($t) => ($metode[$t->metode] ?? ($t->metode ?: '-')) . ($t->metode === 'transfer' && $t->bank ? ' (' . ($bankLabel[$t->bank] ?? $t->bank) . ')' : '');
 @endphp
 <section class="panel">
   <h2>Daftar Transaksi</h2>
@@ -17,7 +19,11 @@
         <td>TRX-{{ str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT) }}</td>
         <td>{{ \Illuminate\Support\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
         <td>{{ $t->nama }}</td><td>{{ $rp($t->total) }}</td>
-        <td>{{ $metode[$t->metode] ?? ($t->metode ?: '-') }}</td>
+        <td>{{ $namaMetode($t) }}
+          @if ($t->bukti)
+            <br><a class="lnk" href="{{ asset('uploads/bukti/' . $t->bukti) }}" target="_blank" rel="noopener" style="font-size:12px">Lihat bukti</a>
+          @endif
+        </td>
         <td><span class="bd {{ $lunas ? 'g' : 'y' }}">{{ $lunas ? 'Lunas' : 'Menunggu' }}</span></td>
         <td>
           @unless ($lunas)

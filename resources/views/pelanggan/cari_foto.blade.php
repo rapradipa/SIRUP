@@ -16,7 +16,7 @@
         <label class="btn" for="f-unggah"><x-ikon n="upload" :s="16" /> Unggah Gambar</label>
       </div>
       <input type="file" id="f-unggah" accept="image/jpeg,image/png,image/webp" hidden>
-      <p class="mu" style="font-size:12px;margin-top:14px">Foto dikirim ke layanan AI (Groq) hanya untuk dikenali dan tidak disimpan di server toko.</p>
+      
     </section>
 
     <section class="rr" aria-labelledby="jr">

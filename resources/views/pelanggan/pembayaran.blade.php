@@ -5,7 +5,9 @@
 @php
   $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
   $lunas = strtolower($t->status_pembayaran) === 'lunas';
-  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'ewallet' => 'E-Wallet'];
+  $metode = ['tunai' => 'Tunai di Toko', 'transfer' => 'Transfer Bank', 'qris' => 'QRIS'];
+  $bankLabel = ['bri' => 'Bank BRI', 'mandiri' => 'Bank Mandiri'];
+  $butuhDetail = in_array($t->metode, ['qris', 'transfer'], true);
   $kode = 'TRX-' . str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT);
   $d0 = $tersimpan->first();
   $stg = ['diproses' => ['b', 'Diproses'], 'dikirim' => ['b', 'Dikirim'], 'selesai' => ['g', 'Selesai'], 'menunggu' => ['y', 'Menunggu']];
@@ -18,20 +20,67 @@
     <div class="banner"><b>Pembayaran Lunas</b><span>Transaksi {{ $kode }} sudah dibayar.@unless ($g) Isi alamat jika ingin menggunakan layanan pengiriman.@endunless</span></div>
   @endif
 
-  <div class="cg">
+  <div class="cg cg-sum-first">
     @if (! $lunas)
-      <form id="fb" class="panel" method="post" action="{{ route('pembayaran.bayar', $t->id_transaksi) }}">
+      <div style="display:grid;gap:24px">
+      <form id="fb" class="panel" method="post" action="{{ route('pembayaran.bayar', $t->id_transaksi) }}" autocomplete="off">
         @csrf
         <h2>Pilih Metode Pembayaran</h2>
         @foreach ($metode as $v => $l)
-          <label class="rad"><input type="radio" name="metode" value="{{ $v }}" @checked(old('metode', $t->metode) === $v) required> {{ $l }}</label>
+          <label class="rad"><input type="radio" name="metode" class="jm" value="{{ $v }}" @checked(old('metode', $t->metode) === $v) required> {{ $l }}</label>
+          @if ($v === 'transfer')
+            <div id="bankBox" class="subbank" @if (old('metode', $t->metode) !== 'transfer') hidden @endif>
+              @foreach ($bankLabel as $bv => $bl)
+                <label class="rad"><input type="radio" name="bank" value="{{ $bv }}" @checked(old('bank', $t->bank) === $bv)> {{ $bl }}</label>
+              @endforeach
+              @error('bank')<div class="err">{{ $message }}</div>@enderror
+            </div>
+          @endif
         @endforeach
         @error('metode')<div class="err">{{ $message }}</div>@enderror
         <div class="note">Setelah pembayaran diverifikasi, status transaksi berubah menjadi Lunas.</div>
-        @if ($t->metode)
-          <div class="note y">Metode tercatat: {{ $metode[$t->metode] ?? $t->metode }}. Menunggu verifikasi kasir.</div>
+        @if ($t->metode === 'tunai')
+          <div class="note y">Metode tercatat: Tunai di Toko. Menunggu verifikasi kasir.</div>
         @endif
       </form>
+
+      @if ($butuhDetail)
+        <section class="panel">
+          @if ($t->metode === 'qris')
+            <h2>Bayar dengan QRIS</h2>
+            <p class="mu">Pindai kode di bawah ini memakai aplikasi e-wallet atau m-banking Anda.</p>
+            <div style="display:flex;justify-content:center;margin:14px 0">
+              <img src="{{ asset(config('toko.qris_gambar')) }}" alt="Kode QRIS {{ config('toko.nama') }}" style="max-width:260px;width:100%;border-radius:14px;border:1px solid var(--line)">
+            </div>
+          @else
+            @php $rek = config('toko.rekening.' . $t->bank); @endphp
+            <h2>Transfer ke {{ $rek['label'] ?? $bankLabel[$t->bank] ?? 'Bank' }}</h2>
+            <p class="mu">Transfer sesuai total tagihan ke rekening berikut, lalu kirim bukti transfer.</p>
+            <div class="note" style="margin-top:14px">
+              <div style="font-size:12px;font-weight:600;opacity:.8">No. Rekening</div>
+              <div style="font-size:19px;letter-spacing:.5px">{{ $rek['nomor'] ?? 'Belum diatur admin' }}</div>
+              <div style="margin-top:8px;font-size:13px">a.n. {{ $rek['nama'] ?? config('toko.nama') }}</div>
+            </div>
+          @endif
+
+          @if ($t->bukti)
+            <div class="note g">Bukti pembayaran terkirim. Menunggu verifikasi kasir.</div>
+            <p class="mu" style="margin-top:8px"><a class="lnk" href="{{ asset('uploads/bukti/' . $t->bukti) }}" target="_blank" rel="noopener">Lihat bukti yang sudah dikirim</a></p>
+            <p class="mu" style="margin-top:10px">Kirim ulang jika bukti sebelumnya salah atau kurang jelas:</p>
+          @else
+            <div class="note">Setelah membayar, unggah bukti pembayaran agar kasir dapat memverifikasi.</div>
+          @endif
+
+          <form method="post" action="{{ route('pembayaran.bukti', $t->id_transaksi) }}" enctype="multipart/form-data" style="margin-top:14px">
+            @csrf
+            <label class="drop" for="bukti"><x-ikon n="upload" :s="24" /><b>{{ $t->bukti ? 'Ganti bukti pembayaran' : 'Unggah bukti pembayaran' }}</b><span class="mu">Format JPG, PNG, atau WEBP, maksimal 2 MB</span></label>
+            <input type="file" id="bukti" name="bukti" accept="image/jpeg,image/png,image/webp" hidden required>
+            @error('bukti')<div class="err">{{ $message }}</div>@enderror
+            <button class="btn full" style="margin-top:14px">Kirim Bukti Pembayaran</button>
+          </form>
+        </section>
+      @endif
+      </div>
     @elseif ($g)
       <section class="panel">
         <div class="rw"><h2>Pengiriman</h2>@php [$wr, $tx] = $stg[strtolower($g->status_pengiriman)] ?? ['b', ucfirst($g->status_pengiriman)]; @endphp<span class="bd {{ $wr }}">{{ $tx }}</span></div>
@@ -112,6 +161,11 @@
 @endsection
 @push('scripts')
 <script>
+const bankBox = document.getElementById('bankBox');
+if (bankBox) document.querySelectorAll('input.jm').forEach(r => r.addEventListener('change', () => {
+  bankBox.hidden = r.value !== 'transfer';
+}));
+
 const pilih = document.getElementById('pilih');
 if (pilih) pilih.addEventListener('change', () => {
   const o = pilih.selectedOptions[0], set = (id, v) => document.getElementById(id).value = v || '';

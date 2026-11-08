@@ -21,7 +21,7 @@
         <td><span class="bd {{ $lunas ? 'g' : 'y' }}">{{ $lunas ? 'Lunas' : 'Menunggu' }}</span></td>
         <td>
           @unless ($lunas)
-            <form method="post" action="{{ route('admin.transaksi.lunas', $t->id_transaksi) }}" onsubmit="return confirm('Tandai transaksi ini lunas? Stok produk akan dikurangi.')">
+            <form method="post" action="{{ route('admin.transaksi.lunas', $t->id_transaksi) }}" data-confirm="Tandai transaksi ini lunas? Stok produk akan dikurangi.">
               @csrf <button class="btn sm">Verifikasi Lunas</button>
             </form>
           @endunless

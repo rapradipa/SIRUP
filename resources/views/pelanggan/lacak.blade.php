@@ -71,9 +71,9 @@
           </div>
         @endforeach
         @if ($sg === 'dikirim')
-          <form method="post" action="{{ route('pesanan.terima', $t->id_transaksi) }}">
+          <form method="post" action="{{ route('pesanan.terima', $t->id_transaksi) }}" data-confirm="Konfirmasi bahwa pesanan sudah Anda terima?">
             @csrf
-            <button class="btn full" onclick="return confirm('Konfirmasi bahwa pesanan sudah Anda terima?')">Pesanan Diterima</button>
+            <button class="btn full">Pesanan Diterima</button>
           </form>
         @endif
       </aside>

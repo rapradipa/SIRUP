@@ -1,22 +1,20 @@
 @extends('layouts.app')
-@section('title', 'Cari dengan Kamera - Raden Group')
+@section('title', 'Cari dengan Foto - Raden Group')
 @section('page_class', 'home')
 @section('content')
 <div class="wrap">
-  <nav class="crumb" aria-label="Breadcrumb"><a href="{{ route('beranda') }}">Beranda</a> &rsaquo; <span>Cari dengan Kamera</span></nav>
+  <nav class="crumb" aria-label="Breadcrumb"><a href="{{ route('beranda') }}">Beranda</a> &rsaquo; <span>Cari dengan Foto</span></nav>
   <div class="vs">
     <section class="l" aria-labelledby="jl">
-      <h2 id="jl">Cari dengan Kamera</h2>
-      <p class="mu">Arahkan kamera ke barang atau unggah foto untuk menemukan produk yang mirip di Raden Group.</p>
+      <h2 id="jl">Cari dengan Foto</h2>
+      <p class="mu">Unggah foto barang untuk menemukan produk yang mirip di Raden Group.</p>
       <div class="dz" id="dz">
-        <div id="dzt"><x-ikon n="camera" :s="34" /><p><b>Arahkan ke barang</b><br><span class="mu">Format JPG, PNG, atau WEBP</span></p></div>
+        <div id="dzt"><x-ikon n="upload" :s="34" /><p><b>Pilih foto barang</b><br><span class="mu">Format JPG, PNG, atau WEBP</span></p></div>
         <img id="prev" alt="Foto yang akan dicari" hidden>
       </div>
       <div class="vbtn">
-        <label class="btn" for="f-kamera"><x-ikon n="camera" :s="16" /> Ambil Foto</label>
-        <label class="btn out" for="f-unggah"><x-ikon n="upload" :s="16" /> Unggah Gambar</label>
+        <label class="btn" for="f-unggah"><x-ikon n="upload" :s="16" /> Unggah Gambar</label>
       </div>
-      <input type="file" id="f-kamera" accept="image/*" capture="environment" hidden>
       <input type="file" id="f-unggah" accept="image/jpeg,image/png,image/webp" hidden>
       <p class="mu" style="font-size:12px;margin-top:14px">Foto dikirim ke layanan AI (Groq) hanya untuk dikenali dan tidak disimpan di server toko.</p>
     </section>
@@ -95,6 +93,6 @@ function tampil(d) {
   });
   $('hasil').replaceChildren(w);
 }
-['f-kamera', 'f-unggah'].forEach(i => $(i).addEventListener('change', e => { proses(e.target.files[0]); e.target.value = ''; }));
+$('f-unggah').addEventListener('change', e => { proses(e.target.files[0]); e.target.value = ''; });
 </script>
 @endpush

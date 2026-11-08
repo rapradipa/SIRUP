@@ -36,7 +36,7 @@
         <td><span class="bd {{ $kls }}">{{ $lbl }}</span> <small class="mu">{{ $p->stok }}</small></td>
         <td class="aks">
           <a class="ib2" href="{{ route('admin.produk.ubah', $p->id_produk) }}" aria-label="Ubah {{ $p->nama_produk }}"><x-ikon n="edit" :s="15" /></a>
-          <form method="post" action="{{ route('admin.produk.hapus', $p->id_produk) }}" onsubmit="return confirm({{ \Illuminate\Support\Js::from('Hapus produk ' . $p->nama_produk . '?') }})">
+          <form method="post" action="{{ route('admin.produk.hapus', $p->id_produk) }}" data-confirm="{{ 'Hapus produk ' . $p->nama_produk . '?' }}" data-confirm-danger>
             @csrf @method('DELETE')
             <button class="ib2 red" aria-label="Hapus {{ $p->nama_produk }}"><x-ikon n="trash" :s="15" /></button>
           </form>

@@ -18,7 +18,7 @@
         <td class="aks">
           <a class="ib2" href="{{ route('admin.pengguna.show', $a->id_akun) }}" title="Kelola akun" aria-label="Kelola akun {{ $a->nama }}"><x-ikon n="edit" :s="15" /></a>
           @if ($a->role !== 'pelanggan' && $a->id_akun !== auth()->id())
-            <form method="post" action="{{ route('admin.pengguna.hapus', $a->id_akun) }}" onsubmit="return confirm('Hapus akun login ini?')">@csrf @method('DELETE')<button class="ib2 red" title="Hapus akun" aria-label="Hapus akun"><x-ikon n="trash" :s="15" /></button></form>
+            <form method="post" action="{{ route('admin.pengguna.hapus', $a->id_akun) }}" data-confirm="Hapus akun login ini?" data-confirm-danger>@csrf @method('DELETE')<button class="ib2 red" title="Hapus akun" aria-label="Hapus akun"><x-ikon n="trash" :s="15" /></button></form>
           @endif
         </td>
       </tr>

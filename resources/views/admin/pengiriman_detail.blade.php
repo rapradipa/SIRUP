@@ -28,12 +28,12 @@
         </form>
       @elseif ($sg === 'diproses' && $ambil)
         <p class="mu" style="margin:0 0 12px">Pelanggan akan mengambil pesanan di toko. Tandai setelah pesanan diserahkan.</p>
-        <form method="post" action="{{ route('admin.pengiriman.ubah', $g->id_transaksi) }}" onsubmit="return confirm('Tandai pesanan ini sudah diambil?')">
+        <form method="post" action="{{ route('admin.pengiriman.ubah', $g->id_transaksi) }}" data-confirm="Tandai pesanan ini sudah diambil?">
           @csrf <input type="hidden" name="aksi" value="selesai"><button class="btn"><x-ikon n="check" :s="16" /> Tandai Diambil</button>
         </form>
       @elseif ($sg === 'dikirim')
         <div class="note"><b>{{ $g->kurir }}</b> &middot; resi {{ $g->no_resi }}@if ($g->estimasi_tiba)<br>Estimasi tiba: {{ \Illuminate\Support\Carbon::parse($g->estimasi_tiba)->format('d/m/Y') }}@endif</div>
-        <form method="post" action="{{ route('admin.pengiriman.ubah', $g->id_transaksi) }}" onsubmit="return confirm('Tandai pesanan ini sudah diterima pelanggan?')" style="margin-top:14px">
+        <form method="post" action="{{ route('admin.pengiriman.ubah', $g->id_transaksi) }}" data-confirm="Tandai pesanan ini sudah diterima pelanggan?" style="margin-top:14px">
           @csrf <input type="hidden" name="aksi" value="selesai"><button class="btn"><x-ikon n="check" :s="16" /> Tandai Diterima</button>
         </form>
       @elseif ($sg === 'selesai')

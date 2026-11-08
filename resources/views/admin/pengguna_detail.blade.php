@@ -16,7 +16,7 @@
   </section>
 
   <form class="panel" method="post" action="{{ route('admin.pengguna.sandi', $a->id_akun) }}" novalidate
-        onsubmit="return confirm('Ubah kata sandi akun ini? Pengguna harus memakai kata sandi baru untuk masuk.')">
+        data-confirm="Ubah kata sandi akun ini? Pengguna harus memakai kata sandi baru untuk masuk.">
     @csrf @method('PUT')
     <h2><x-ikon n="lock" :s="18" style="vertical-align:-3px" /> Ubah Kata Sandi</h2>
     <div class="f" style="margin-top:14px"><label for="password">Kata sandi baru</label>

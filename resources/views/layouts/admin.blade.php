@@ -50,6 +50,37 @@
     <div class="body">@include('partials.flash')@yield('content')</div>
   </div>
 </div>
+<div class="cf-bg" id="cfBg" hidden>
+  <div class="cf-box" role="alertdialog" aria-modal="true" aria-labelledby="cfMsg">
+    <p id="cfMsg"></p>
+    <div class="cf-act">
+      <button type="button" id="cfCancel">Batal</button>
+      <button type="button" id="cfOk" class="cf-ok">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var bg=document.getElementById('cfBg'), msg=document.getElementById('cfMsg'), ok=document.getElementById('cfOk'), cancel=document.getElementById('cfCancel');
+  var target=null;
+  function tutup(){ bg.hidden=true; target=null; }
+  document.addEventListener('submit', function(e){
+    var f=e.target;
+    if (f.tagName==='FORM' && f.hasAttribute('data-confirm')) {
+      e.preventDefault();
+      target=f;
+      msg.textContent=f.getAttribute('data-confirm');
+      ok.className='cf-ok' + (f.hasAttribute('data-confirm-danger') ? ' cf-danger' : '');
+      bg.hidden=false;
+      ok.focus();
+    }
+  });
+  ok.addEventListener('click', function(){ var f=target; tutup(); if (f) f.submit(); });
+  cancel.addEventListener('click', tutup);
+  bg.addEventListener('click', function(e){ if (e.target===bg) tutup(); });
+  document.addEventListener('keydown', function(e){ if (e.key==='Escape' && !bg.hidden) tutup(); });
+})();
+</script>
 @stack('scripts')
 </body>
 </html>

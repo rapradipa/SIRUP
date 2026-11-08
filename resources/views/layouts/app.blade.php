@@ -18,7 +18,7 @@
   <form id="cari" class="sr" method="get" action="{{ route('katalog') }}" role="search">
     <x-ikon n="search" :s="18" />
     <input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="Cari lemari, kulkas, kasur, dan perabotan lainnya" aria-label="Cari produk">
-    <a class="cam" href="{{ route('cari.foto') }}"><x-ikon n="camera" :s="16" /> Cari dengan Kamera</a>
+    <a class="cam" href="{{ route('cari.foto') }}"><x-ikon n="camera" :s="16" /> Cari dengan Foto</a>
   </form>
   <button form="cari" class="hb navy hide">Cari</button>
   @php $nk = ($u && $u->id_pelanggan) ? (int) \Illuminate\Support\Facades\DB::table('keranjang')->where('id_pelanggan', $u->id_pelanggan)->sum('jumlah') : 0; @endphp
@@ -32,6 +32,37 @@
 </div></header>
 <main class="page @yield('page_class')">@include('partials.flash')@yield('content')</main>
 <footer class="foot"><div class="in"><b>Raden Group</b><span>Jl. Raya Caruban-Ngawi, Desa Karangjati, Kec. Karangjati, Kab. Ngawi, Jawa Timur &middot; <a href="{{ route('kontak') }}" style="text-decoration:underline">Kontak Kami</a></span></div></footer>
+<div class="cf-bg" id="cfBg" hidden>
+  <div class="cf-box" role="alertdialog" aria-modal="true" aria-labelledby="cfMsg">
+    <p id="cfMsg"></p>
+    <div class="cf-act">
+      <button type="button" id="cfCancel">Batal</button>
+      <button type="button" id="cfOk" class="cf-ok">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var bg=document.getElementById('cfBg'), msg=document.getElementById('cfMsg'), ok=document.getElementById('cfOk'), cancel=document.getElementById('cfCancel');
+  var target=null;
+  function tutup(){ bg.hidden=true; target=null; }
+  document.addEventListener('submit', function(e){
+    var f=e.target;
+    if (f.tagName==='FORM' && f.hasAttribute('data-confirm')) {
+      e.preventDefault();
+      target=f;
+      msg.textContent=f.getAttribute('data-confirm');
+      ok.className='cf-ok' + (f.hasAttribute('data-confirm-danger') ? ' cf-danger' : '');
+      bg.hidden=false;
+      ok.focus();
+    }
+  });
+  ok.addEventListener('click', function(){ var f=target; tutup(); if (f) f.submit(); });
+  cancel.addEventListener('click', tutup);
+  bg.addEventListener('click', function(e){ if (e.target===bg) tutup(); });
+  document.addEventListener('keydown', function(e){ if (e.key==='Escape' && !bg.hidden) tutup(); });
+})();
+</script>
 @stack('scripts')
 </body>
 </html>

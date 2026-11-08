@@ -18,7 +18,7 @@
               <b>{{ $a->label }}</b>@if ($a->utama) <span class="bd g">Utama</span>@endif
               <span class="al-a">
                 <a class="lnk" href="{{ route('akun.alamat.ubah', $a->id_alamat) }}">Ubah</a>
-                <form method="post" action="{{ route('akun.alamat.hapus', $a->id_alamat) }}" onsubmit="return confirm({{ \Illuminate\Support\Js::from('Hapus alamat ' . $a->label . '?') }})">@csrf @method('DELETE')<button class="lnk red">Hapus</button></form>
+                <form method="post" action="{{ route('akun.alamat.hapus', $a->id_alamat) }}" data-confirm="{{ 'Hapus alamat ' . $a->label . '?' }}" data-confirm-danger>@csrf @method('DELETE')<button class="lnk red">Hapus</button></form>
                 @unless ($a->utama)
                   <form method="post" action="{{ route('akun.alamat.utama', $a->id_alamat) }}">@csrf<button class="lnk">Jadikan Utama</button></form>
                 @endunless

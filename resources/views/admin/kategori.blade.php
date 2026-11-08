@@ -25,7 +25,7 @@
         </td>
         <td>{{ $k->jumlah_produk }}</td>
         <td class="aks">
-          <form method="post" action="{{ route('admin.kategori.hapus', $k->id_kategori) }}" onsubmit="return confirm({{ \Illuminate\Support\Js::from('Hapus kategori ' . $k->nama_kategori . '?') }})">
+          <form method="post" action="{{ route('admin.kategori.hapus', $k->id_kategori) }}" data-confirm="{{ 'Hapus kategori ' . $k->nama_kategori . '?' }}" data-confirm-danger>
             @csrf @method('DELETE')
             <button class="ib2 red" aria-label="Hapus {{ $k->nama_kategori }}"><x-ikon n="trash" :s="15" /></button>
           </form>

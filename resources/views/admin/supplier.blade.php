@@ -14,7 +14,7 @@
         <td><b>{{ $s->nama_supplier }}</b></td><td>{{ $s->alamat ?: '-' }}</td><td>{{ $s->no_telpon ?: '-' }}</td>
         <td class="aks">
           <a class="ib2" href="{{ route('admin.supplier.ubah', $s->id_supplier) }}" aria-label="Ubah {{ $s->nama_supplier }}"><x-ikon n="edit" :s="15" /></a>
-          <form method="post" action="{{ route('admin.supplier.hapus', $s->id_supplier) }}" onsubmit="return confirm({{ \Illuminate\Support\Js::from('Hapus supplier ' . $s->nama_supplier . '?') }})">
+          <form method="post" action="{{ route('admin.supplier.hapus', $s->id_supplier) }}" data-confirm="{{ 'Hapus supplier ' . $s->nama_supplier . '?' }}" data-confirm-danger>
             @csrf @method('DELETE')
             <button class="ib2 red" aria-label="Hapus {{ $s->nama_supplier }}"><x-ikon n="trash" :s="15" /></button>
           </form>

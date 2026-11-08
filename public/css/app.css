@@ -231,3 +231,15 @@ td.aks form{margin:0}
 
 /* ikon aksi */
 td.aks{gap:8px}.ib2.pri{background:var(--blue);color:#fff}a.ib2:hover{filter:brightness(.93)}
+
+/* modal konfirmasi (pengganti confirm() bawaan browser) */
+.cf-bg{position:fixed;inset:0;background:rgba(15,27,61,.45);display:flex;align-items:center;justify-content:center;padding:20px;z-index:200}
+.cf-bg[hidden]{display:none}
+.cf-box{background:#fff;border-radius:16px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 50px rgba(15,27,61,.25)}
+.cf-box p{margin:0 0 22px;color:var(--tx);font-size:15px;line-height:1.5}
+.cf-act{display:flex;justify-content:flex-end;gap:10px}
+.cf-act button{border-radius:10px;height:42px;padding:0 18px;font-weight:700;font-size:14px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--tx)}
+.cf-act button.cf-ok{background:var(--blue);border-color:var(--blue);color:#fff}
+.cf-act button.cf-ok.cf-danger{background:var(--red);border-color:var(--red)}
+.cf-act button:hover{filter:brightness(.95)}
+@media(max-width:560px){.cf-box{padding:20px}.cf-act{flex-direction:column-reverse}.cf-act button{width:100%}}

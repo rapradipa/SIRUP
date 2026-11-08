@@ -7,7 +7,10 @@
   $stg = ['diproses' => ['b', 'Diproses'], 'dikirim' => ['b', 'Dikirim'], 'selesai' => ['g', 'Selesai'], 'menunggu' => ['y', 'Menunggu']];
 @endphp
 <div class="wrap">
-  <nav class="crumb" aria-label="Breadcrumb"><a href="{{ route('beranda') }}">Beranda</a> &rsaquo; <span>Pesanan Saya</span> &rsaquo; <span>Riwayat Transaksi</span></nav>
+  <nav class="crumb" aria-label="Breadcrumb"><a href="{{ route('beranda') }}">Beranda</a> &rsaquo; <a href="{{ route('akun') }}">Akun Saya</a> &rsaquo; <span>Riwayat Transaksi</span></nav>
+  <div class="ak">
+    @include('pelanggan._akun_menu')
+    <div style="min-width:0">
   <h1 class="pt">Riwayat Transaksi</h1>
 
   <section class="stats s3" aria-label="Ringkasan">
@@ -66,6 +69,8 @@
     @else
       <p class="empty">Tidak ada transaksi yang cocok. <a class="lnk" href="{{ route('katalog') }}">Mulai belanja</a></p>
     @endif
+  </div>
+    </div>
   </div>
 </div>
 @endsection

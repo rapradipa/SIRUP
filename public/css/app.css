@@ -86,7 +86,7 @@ td{padding:15px 16px;border-bottom:1px solid #e8eefb;font-size:13px}td:first-chi
 .cat .ci{width:46px;height:46px;border-radius:50%;background:var(--bg);border:1px solid var(--line);display:grid;place-items:center;color:var(--navy)}
 .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
 .pc{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
-.pc .ph{background:var(--soft);height:156px;display:grid;place-items:center}.pc .ph img{max-height:110px;max-width:70%;object-fit:contain}
+.pc .ph{background:var(--soft);aspect-ratio:5/4;display:grid;place-items:center;overflow:hidden}.pc .ph img{width:100%;height:100%;object-fit:cover}
 .pc .cb{padding:14px 14px 16px;display:flex;flex-direction:column;gap:6px;flex:1}
 .pc .nm{font-weight:700;font-size:14.5px}.pc .pr{display:flex;align-items:center;gap:8px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:19px;color:var(--blue)}
 .pc .dc{background:var(--red);color:#fff;font-family:'Manrope',sans-serif;font-size:11px;font-weight:700;border-radius:6px;padding:2px 8px}
@@ -222,7 +222,7 @@ td.aks form{margin:0}
 .vs .l{background:var(--soft);padding:28px}.vs .rr{padding:28px;min-width:0}.vs h2{font-size:20px;font-weight:800;color:var(--navy);margin-bottom:6px}
 .dz{border:2px dashed #9db8f5;border-radius:16px;min-height:260px;display:grid;place-items:center;background:#fff;text-align:center;padding:14px;margin-top:14px;color:var(--blue);overflow:hidden}
 .dz img{max-width:100%;max-height:300px;object-fit:contain;border-radius:10px}.dz p{margin:8px 0 0;color:var(--tx)}
-.vbtn{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.vbtn .btn{cursor:pointer}
+.vbtn{display:flex;gap:10px;margin-top:14px}.vbtn .btn{cursor:pointer;flex:1;justify-content:center}
 #det{display:inline-block;margin:6px 0 14px}
 .vr{display:flex;flex-direction:column;gap:3px;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#fff}.vr:hover{border-color:var(--blue)}
 .vr.top{border:2px solid var(--blue)}.vr b{font-size:14.5px}.vm{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}.vr .pr{font-size:16px}
@@ -245,3 +245,15 @@ td.aks{gap:8px}.ib2.pri{background:var(--blue);color:#fff}a.ib2:hover{filter:bri
 .cf-act button.cf-ok.cf-danger{background:var(--red);border-color:var(--red)}
 .cf-act button:hover{filter:brightness(.95)}
 @media(max-width:560px){.cf-box{padding:20px}.cf-act{flex-direction:column-reverse}.cf-act button{width:100%}}
+
+/* pemilih ikon kategori (admin) */
+.ikd{position:relative;flex:none}
+.ikd summary{list-style:none;cursor:pointer;display:grid;place-items:center;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:var(--soft);color:var(--blue)}
+.ikd summary::-webkit-details-marker{display:none}
+.ikd[open] summary,.ikd summary:hover{border-color:var(--blue)}
+.ikg{position:absolute;z-index:20;top:46px;left:0;display:grid;grid-template-columns:repeat(6,38px);gap:6px;padding:10px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(15,27,61,.15)}
+.tw .ikg{position:static;margin-top:8px;box-shadow:none}
+.ikp{position:relative;display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--line);border-radius:8px;cursor:pointer;color:var(--tx);background:#fff}
+.ikp:hover{border-color:var(--blue)}
+.ikp:has(input:checked){border-color:var(--blue);background:var(--soft);color:var(--blue)}
+.ikp input{position:absolute;opacity:0;width:0;height:0;margin:0;padding:0;border:0;pointer-events:none}

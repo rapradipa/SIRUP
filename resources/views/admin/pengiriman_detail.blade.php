@@ -16,11 +16,17 @@
       <div class="rw" style="padding-top:0"><h2>Perbarui Status</h2><span class="bd {{ $stg[$sg][0] ?? 'b' }}">{{ $stg[$sg][1] ?? ucfirst($sg) }}</span></div>
 
       @if ($sg === 'diproses' && ! $ambil)
-        <p class="mu" style="margin:0 0 12px">Isi data kurir saat pesanan diserahkan untuk dikirim.</p>
+        <p class="mu" style="margin:0 0 12px">Pilih staf yang mengantar pesanan ini.</p>
         <form method="post" action="{{ route('admin.pengiriman.ubah', $g->id_transaksi) }}">
           @csrf <input type="hidden" name="aksi" value="kirim">
           <div class="fg2">
-            <div class="f"><label for="kurir">Kurir</label><input type="text" id="kurir" name="kurir" value="{{ old('kurir') }}" maxlength="60" placeholder="Contoh: JNE" required></div>
+            <div class="f"><label for="id_kurir">Kurir (staf)</label>
+              <select id="id_kurir" name="id_kurir" required>
+                <option value="">Pilih staf</option>
+                @foreach ($staf as $s)
+                  <option value="{{ $s->id_karyawan }}" @selected((string) old('id_kurir') === (string) $s->id_karyawan)>{{ $s->nama }}</option>
+                @endforeach
+              </select></div>
             <div class="f"><label for="no_resi">No. resi</label><input type="text" id="no_resi" name="no_resi" value="{{ old('no_resi') }}" maxlength="40" required></div>
           </div>
           <div class="f"><label for="estimasi_tiba">Estimasi tiba (opsional)</label><input type="date" id="estimasi_tiba" name="estimasi_tiba" value="{{ old('estimasi_tiba') }}" min="{{ today()->toDateString() }}"></div>

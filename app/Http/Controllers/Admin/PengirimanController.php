@@ -33,7 +33,9 @@ class PengirimanController extends Controller
         $items = DB::table('detail_transaksi as d')->join('produk as p', 'p.id_produk', '=', 'd.id_produk')
             ->where('d.id_transaksi', $id)->orderBy('d.id_detail')->get(['d.jumlah', 'd.subtotal', 'p.nama_produk']);
         $log = DB::table('pengiriman_log')->where('id_transaksi', $id)->orderByDesc('id_log')->get();
-        return view('admin.pengiriman_detail', compact('g', 'items', 'log'));
+        // Kurir dipilih dari staf (karyawan), bukan diketik bebas.
+        $staf = DB::table('karyawan')->orderBy('nama')->get(['id_karyawan', 'nama']);
+        return view('admin.pengiriman_detail', compact('g', 'items', 'log', 'staf'));
     }
 
     public function ubah(Request $r, int $id, PengirimanService $layanan)
@@ -42,10 +44,13 @@ class PengirimanController extends Controller
         try {
             if ($aksi === 'kirim') {
                 $v = Validator::make($r->all(), [
-                    'kurir' => 'required|string|max:60', 'no_resi' => 'required|string|max:40', 'estimasi_tiba' => 'nullable|date|after_or_equal:today',
-                ], [], ['kurir' => 'Kurir', 'no_resi' => 'No. resi', 'estimasi_tiba' => 'Estimasi tiba']);
+                    'id_kurir' => 'required|exists:karyawan,id_karyawan', 'no_resi' => 'required|string|max:40', 'estimasi_tiba' => 'nullable|date|after_or_equal:today',
+                ], ['id_kurir.required' => 'Pilih staf yang mengantar.', 'id_kurir.exists' => 'Staf yang dipilih tidak ditemukan.'], ['id_kurir' => 'Kurir', 'no_resi' => 'No. resi', 'estimasi_tiba' => 'Estimasi tiba']);
                 if ($v->fails()) return back()->with('err', $v->errors()->first());
-                $layanan->ubah($id, 'dikirim', $v->validated());
+                $data = $v->validated();
+                $data['kurir'] = DB::table('karyawan')->where('id_karyawan', $data['id_kurir'])->value('nama');
+                unset($data['id_kurir']);
+                $layanan->ubah($id, 'dikirim', $data);
             } elseif ($aksi === 'selesai') {
                 $layanan->ubah($id, 'selesai');
             } else {

@@ -28,21 +28,30 @@ class ProdukController extends Controller
             'kategori' => DB::table('kategori')->orderBy('nama_kategori')->get()]);
     }
 
+    /** Alamat daftar produk (lengkap dengan filter/halaman) tempat pengguna datang; aman dari open-redirect. */
+    private function kembali(Request $r): string
+    {
+        $u = (string) ($r->input('kembali') ?? '');
+        $path = parse_url(route('admin.produk'), PHP_URL_PATH);
+        $aman = str_starts_with($u, '/') && ! str_starts_with($u, '//') && ($u === $path || str_starts_with($u, $path . '?'));
+        return $aman ? $u : route('admin.produk');
+    }
+
     private function opsi(): array
     {
         return ['kategori' => DB::table('kategori')->orderBy('nama_kategori')->get(), 'supplier' => DB::table('supplier')->orderBy('nama_supplier')->get()];
     }
 
-    public function baru()
+    public function baru(Request $r)
     {
-        return view('admin.produk_form', ['p' => null] + $this->opsi());
+        return view('admin.produk_form', ['p' => null, 'kembali' => $this->kembali($r)] + $this->opsi());
     }
 
-    public function ubah(int $id)
+    public function ubah(Request $r, int $id)
     {
         $p = DB::table('produk')->where('id_produk', $id)->first();
         abort_if(! $p, 404);
-        return view('admin.produk_form', ['p' => $p] + $this->opsi());
+        return view('admin.produk_form', ['p' => $p, 'kembali' => $this->kembali($r)] + $this->opsi());
     }
 
     private function aturan(bool $baru): array
@@ -80,7 +89,7 @@ class ProdukController extends Controller
             'harga' => $d['harga'], 'stok' => $d['stok'], 'diskon' => (int) ($d['diskon'] ?? 0),
             'deskripsi' => $d['deskripsi'] ?? null, 'gambar' => $this->simpanFoto($r),
         ]);
-        return redirect()->route('admin.produk')->with('ok', "Produk \"{$d['nama_produk']}\" ditambahkan.");
+        return redirect($this->kembali($r))->with('ok', "Produk \"{$d['nama_produk']}\" ditambahkan.");
     }
 
     public function perbarui(Request $r, int $id)
@@ -98,21 +107,23 @@ class ProdukController extends Controller
             'nama_produk' => $d['nama_produk'], 'id_kategori' => $d['id_kategori'], 'id_supplier' => $d['id_supplier'],
             'harga' => $d['harga'], 'diskon' => (int) ($d['diskon'] ?? 0), 'deskripsi' => $d['deskripsi'] ?? null, 'gambar' => $gambar,
         ]);
-        return redirect()->route('admin.produk')->with('ok', "Produk \"{$d['nama_produk']}\" diperbarui.");
+        return redirect($this->kembali($r))->with('ok', "Produk \"{$d['nama_produk']}\" diperbarui.");
     }
 
-    public function hapus(int $id)
+    public function hapus(Request $r, int $id)
     {
         $p = DB::table('produk')->where('id_produk', $id)->first();
         abort_if(! $p, 404);
         if (DB::table('detail_transaksi')->where('id_produk', $id)->exists() || DB::table('stok_masuk')->where('id_produk', $id)->exists()) {
-            return back()->with('err', "Produk \"{$p->nama_produk}\" sudah punya riwayat transaksi atau stok masuk, jadi tidak bisa dihapus.");
+            $pesan = "Produk \"{$p->nama_produk}\" sudah punya riwayat transaksi atau stok masuk, jadi tidak bisa dihapus.";
+            return $r->expectsJson() ? response()->json(['ok' => false, 'pesan' => $pesan]) : back()->with('err', $pesan);
         }
         DB::transaction(function () use ($id) {
             DB::table('keranjang')->where('id_produk', $id)->delete();
             DB::table('produk')->where('id_produk', $id)->delete();
         });
         $this->hapusFoto($p->gambar);
-        return back()->with('ok', "Produk \"{$p->nama_produk}\" dihapus.");
+        $pesan = "Produk \"{$p->nama_produk}\" dihapus.";
+        return $r->expectsJson() ? response()->json(['ok' => true, 'pesan' => $pesan]) : back()->with('ok', $pesan);
     }
 }

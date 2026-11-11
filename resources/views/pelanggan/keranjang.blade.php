@@ -17,7 +17,7 @@
       <section class="panel cl">
         <div class="ch">
           <label class="ck"><input type="checkbox" id="all" checked> Pilih Semua (<span id="jml">{{ $items->count() }}</span>)</label>
-          <button form="fc" formaction="{{ route('keranjang.hapus') }}" class="lnk red">Hapus yang dipilih</button>
+          <button form="fc" formaction="{{ route('keranjang.hapus') }}" class="lnk red" data-ajax data-refresh>Hapus yang dipilih</button>
         </div>
         @foreach ($items as $i)
           @php $fin = $i->harga * (100 - $i->diskon) / 100; @endphp
@@ -36,7 +36,7 @@
               <div class="pr">{{ $rp($fin) }}</div>
               <small class="mu">Jumlah: {{ $i->jumlah }} &middot; Stok: {{ $i->stok }}</small>
             </div>
-            <form method="post" action="{{ route('keranjang.ubah', $i->id_keranjang) }}">
+            <form method="post" action="{{ route('keranjang.ubah', $i->id_keranjang) }}" data-ajax data-refresh>
               @csrf @method('PATCH')
               <div class="qty">
                 <button name="aksi" value="kurang" aria-label="Kurangi">&minus;</button>
@@ -44,7 +44,7 @@
                 <button name="aksi" value="tambah" aria-label="Tambah">+</button>
               </div>
             </form>
-            <form method="post" action="{{ route('keranjang.buang', $i->id_keranjang) }}">
+            <form method="post" action="{{ route('keranjang.buang', $i->id_keranjang) }}" data-ajax data-refresh>
               @csrf @method('DELETE')
               <button class="lnk red">Hapus</button>
             </form>
@@ -66,19 +66,25 @@
 @endsection
 @push('scripts')
 <script>
-const sel = [...document.querySelectorAll('.sel')], all = document.getElementById('all');
-if (sel.length) {
+(function () {
   const rp = n => 'Rp ' + Math.round(n).toLocaleString('id-ID'), $ = id => document.getElementById(id);
-  const hitung = () => {
+  // Dihitung ulang setiap kali daftar barang berubah (dipanggil juga setelah isi halaman disegarkan lewat AJAX)
+  function hitung() {
+    const sel = [...document.querySelectorAll('.sel')], all = $('all');
+    if (!sel.length || !all) return;
     const on = sel.filter(c => c.checked);
     const sub = on.reduce((a, c) => a + +c.dataset.sub, 0), tot = on.reduce((a, c) => a + +c.dataset.tot, 0);
     $('cn').textContent = $('gn').textContent = on.length; $('jml').textContent = sel.length;
     $('sub').textContent = rp(sub); $('dsc').textContent = '- ' + rp(sub - tot); $('tot').textContent = rp(tot);
     $('go').disabled = !on.length; all.checked = on.length === sel.length;
-  };
-  sel.forEach(c => c.addEventListener('change', hitung));
-  all.addEventListener('change', () => { sel.forEach(c => c.checked = all.checked); hitung(); });
+  }
+  // Event delegation: tetap bekerja walau isi halaman diganti
+  document.addEventListener('change', e => {
+    if (e.target.id === 'all') { document.querySelectorAll('.sel').forEach(c => c.checked = e.target.checked); hitung(); }
+    else if (e.target.classList && e.target.classList.contains('sel')) hitung();
+  });
+  document.addEventListener('ajax:disegarkan', hitung);
   hitung();
-}
+})();
 </script>
 @endpush

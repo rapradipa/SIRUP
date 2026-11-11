@@ -4,10 +4,15 @@
 @php
   $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
   $dua = fn ($n) => str_pad($n, 2, '0', STR_PAD_LEFT);
+  // Angka ringkas untuk label batang grafik: 1,2 jt / 350 rb / 900
+  $ringkasRp = function ($n) {
+    if ($n >= 1000000) return rtrim(rtrim(number_format($n / 1000000, 1, ',', ''), '0'), ',') . ' jt';
+    if ($n >= 1000) return rtrim(rtrim(number_format($n / 1000, 1, ',', ''), '0'), ',') . ' rb';
+    return (string) (int) $n;
+  };
   $warna = ['lunas' => 'g', 'selesai' => 'g', 'dikirim' => 'b', 'diproses' => 'b', 'menunggu' => 'y'];
   $lencana = fn ($s) => '<span class="bd ' . ($warna[strtolower($s ?? 'menunggu')] ?? 'b') . '">' . e(ucfirst($s ?? 'Menunggu')) . '</span>';
   $puncak = $grafik->sum('nilai') > 0 ? $grafik->search(fn ($g) => $g['nilai'] === $grafik->max('nilai')) : -1;
-  $ikon = [1 => 'armchair', 2 => 'pot', 3 => 'home', 4 => 'lamp', 5 => 'monitor', 6 => 'bed', 7 => 'drop', 8 => 'wrench'];
 @endphp
 
 <section class="stats" aria-label="Ringkasan hari ini">
@@ -23,7 +28,7 @@
     <p class="sub">Total pembayaran lunas per hari, minggu ini</p>
     <div class="chart" role="img" aria-label="Grafik penjualan minggu ini">
       @foreach ($grafik as $i => $g)
-        <div title="{{ $rp($g['nilai']) }}"><i class="{{ $i === $puncak ? 'hi' : '' }}" style="height:{{ max($g['nilai'] / $maks * 85, 12) }}%"></i>{{ $g['label'] }}</div>
+        <div title="{{ $rp($g['nilai']) }}">@if ($g['nilai'] > 0)<em class="v">{{ $ringkasRp($g['nilai']) }}</em>@endif<i class="{{ $i === $puncak ? 'hi' : '' }}" style="height:{{ max($g['nilai'] / $maks * 70, 12) }}%"></i>{{ $g['label'] }}</div>
       @endforeach
     </div>
   </div>
@@ -32,7 +37,7 @@
     <p class="sub">Perlu segera restock</p>
     <ul class="lowl">
       @forelse ($menipis as $p)
-        <li><span class="th"><x-ikon :n="$ikon[$p->id_kategori] ?? 'tag'" :s="20" /></span><span class="nm">{{ $p->nama_produk }}</span><span class="bd y">Sisa {{ $dua($p->stok) }}</span></li>
+        <li><span class="th">@if ($p->gambar)<img src="{{ asset('uploads/produk/' . $p->gambar) }}" alt="{{ $p->nama_produk }}">@else<x-ikon :n="\App\Support\IkonKategori::untuk($p->id_kategori)" :s="20" />@endif</span><span class="nm">{{ $p->nama_produk }}</span><span class="bd y">Sisa {{ $dua($p->stok) }}</span></li>
       @empty
         <li class="empty">Semua stok aman.</li>
       @endforelse
@@ -44,17 +49,18 @@
   <h2>Transaksi Terbaru</h2>
   <p class="sub">Lima transaksi terakhir</p>
   <div class="tw"><table>
-    <thead><tr><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Total</th><th>Pembayaran</th><th>Pengiriman</th></tr></thead>
+    <thead><tr><th style="width:48px">No.</th><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Total</th><th>Pembayaran</th><th>Pengiriman</th></tr></thead>
     <tbody>
     @forelse ($terbaru as $t)
       <tr>
+        <td>{{ $loop->iteration }}</td>
         <td>TRX-{{ str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT) }}</td>
         <td>{{ \Illuminate\Support\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
         <td>{{ $t->nama }}</td><td>{{ $rp($t->total) }}</td>
         <td>{!! $lencana($t->status_pembayaran) !!}</td><td>{!! $lencana($t->status_pengiriman) !!}</td>
       </tr>
     @empty
-      <tr><td colspan="6" class="empty">Belum ada transaksi.</td></tr>
+      <tr><td colspan="7" class="empty">Belum ada transaksi.</td></tr>
     @endforelse
     </tbody>
   </table></div>

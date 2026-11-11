@@ -5,9 +5,19 @@
   $stg = ['diproses' => ['b', 'Diproses'], 'dikirim' => ['b', 'Dikirim'], 'selesai' => ['g', 'Selesai'], 'menunggu' => ['y', 'Menunggu']];
 @endphp
 <section class="panel">
-  <h2>Kelola Pengiriman</h2>
-  <p class="sub">Klik pesanan untuk melihat detail dan memperbarui status pengiriman. Setiap perubahan tercatat di riwayat perjalanan.</p>
-  <div class="tw"><table>
+  <div class="tbar">
+    <div><h2>Kelola Pengiriman</h2>
+    <p class="sub" style="margin-bottom:0">Klik pesanan untuk melihat detail dan memperbarui status pengiriman. Setiap perubahan tercatat di riwayat perjalanan.</p></div>
+    <form class="tf" method="get" action="{{ route('admin.pengiriman') }}" role="search">
+      <input type="search" name="q" value="{{ $q }}" maxlength="50" placeholder="Cari no. transaksi, pelanggan, resi..." aria-label="Cari pengiriman">
+      <button class="btn sm">Cari</button>
+      @if ($q !== '')<a class="btn out sm" href="{{ route('admin.pengiriman') }}">Reset</a>@endif
+    </form>
+  </div>
+  @if ($q !== '')
+    <p class="sub" style="margin:12px 0 0">{{ $kirim->total() }} pengiriman ditemukan untuk "{{ $q }}"</p>
+  @endif
+  <div class="tw" style="margin-top:14px"><table>
     <thead><tr><th>No. Transaksi</th><th>Pelanggan</th><th>Tujuan</th><th>Status</th><th>Kurir / Resi</th><th>Aksi</th></tr></thead>
     <tbody>
     @forelse ($kirim as $k)
@@ -21,7 +31,7 @@
         <td class="aks"><a class="ib2" href="{{ route('admin.pengiriman.show', $k->id_transaksi) }}" title="Kelola pengiriman" aria-label="Kelola pengiriman TRX-{{ str_pad($k->id_transaksi, 4, '0', STR_PAD_LEFT) }}"><x-ikon n="edit" :s="15" /></a></td>
       </tr>
     @empty
-      <tr><td colspan="6" class="empty">Belum ada pengiriman. Data muncul setelah pelanggan memilih pengiriman pada pesanan yang sudah lunas.</td></tr>
+      <tr><td colspan="6" class="empty">{{ $q !== '' ? 'Tidak ada pengiriman yang cocok dengan pencarian.' : 'Belum ada pengiriman. Data muncul setelah pelanggan memilih pengiriman pada pesanan yang sudah lunas.' }}</td></tr>
     @endforelse
     </tbody>
   </table></div>

@@ -40,14 +40,13 @@
     <div class="bar">
       <h1>@yield('title')</h1>
       <div class="r">
-        <div class="find soon" title="Segera hadir"><x-ikon n="search" :s="16" /> Cari data...</div>
         <details class="me">
           <summary><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span><span><b>{{ $u->nama }}</b><small>Karyawan / {{ $u->role === 'admin' ? 'Admin' : 'Kasir' }}</small></span></summary>
           <div class="menu"><form method="post" action="{{ route('logout') }}">@csrf<button>Keluar</button></form></div>
         </details>
       </div>
     </div>
-    <div class="body">@include('partials.flash')@yield('content')</div>
+    <div class="body" data-segarkan>@include('partials.flash')@yield('content')</div>
   </div>
 </div>
 <div class="cf-bg" id="cfBg" hidden>
@@ -59,6 +58,7 @@
     </div>
   </div>
 </div>
+@include('partials.ajax')
 <script>
 (function(){
   var bg=document.getElementById('cfBg'), msg=document.getElementById('cfMsg'), ok=document.getElementById('cfOk'), cancel=document.getElementById('cfCancel');
@@ -75,7 +75,7 @@
       ok.focus();
     }
   });
-  ok.addEventListener('click', function(){ var f=target; tutup(); if (f) f.submit(); });
+  ok.addEventListener('click', function(){ var f=target; tutup(); if (!f) return; if (f.hasAttribute('data-ajax') && f.requestSubmit) { f.setAttribute('data-ok','1'); f.requestSubmit(); } else f.submit(); });
   cancel.addEventListener('click', tutup);
   bg.addEventListener('click', function(e){ if (e.target===bg) tutup(); });
   document.addEventListener('keydown', function(e){ if (e.key==='Escape' && !bg.hidden) tutup(); });

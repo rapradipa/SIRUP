@@ -115,14 +115,24 @@ class LaporanController extends Controller
         // Cegah injeksi rumus saat dibuka di Excel/Sheets
         $aman = fn ($v) => is_string($v) && preg_match('/^[=+\-@\t\r]/', $v) ? "'" . $v : $v;
 
-        return response()->streamDownload(function () use ($baris, $item, $aman) {
+        $status = fn ($v) => $v ? ucfirst(strtolower($v)) : '-';
+
+        return response()->streamDownload(function () use ($baris, $item, $aman, $status) {
             $f = fopen('php://output', 'w');
-            fwrite($f, "\xEF\xBB\xBF");
-            fputcsv($f, ['No. Transaksi', 'Tanggal', 'Pelanggan', 'Item', 'Total', 'Pembayaran', 'Pengiriman']);
+            fwrite($f, "\xEF\xBB\xBF"); // BOM supaya huruf/aksen terbaca benar di Excel
+            // Pemisah titik koma = bawaan Excel berbahasa Indonesia, jadi kolom tidak menumpuk dalam satu sel.
+            $tulis = fn (array $kolom) => fputcsv($f, $kolom, ';', '"', '', "\r\n");
+            $tulis(['No. Transaksi', 'Tanggal', 'Pelanggan', 'Item', 'Total (Rp)', 'Pembayaran', 'Pengiriman']);
             foreach ($baris as $b) {
-                fputcsv($f, ['TRX-' . str_pad($b->id_transaksi, 4, '0', STR_PAD_LEFT), $b->tanggal, $aman($b->nama),
-                    $aman(($item[$b->id_transaksi] ?? collect())->pluck('nama_produk')->implode('; ')),
-                    (int) $b->total, $b->status_pembayaran ?: '-', $b->status_pengiriman ?: '-']);
+                $tulis([
+                    'TRX-' . str_pad($b->id_transaksi, 4, '0', STR_PAD_LEFT),
+                    Carbon::parse($b->tanggal)->format('d/m/Y'),
+                    $aman($b->nama),
+                    $aman(($item[$b->id_transaksi] ?? collect())->pluck('nama_produk')->implode(', ')),
+                    (int) $b->total,
+                    $status($b->status_pembayaran),
+                    $status($b->status_pengiriman),
+                ]);
             }
             fclose($f);
         }, "laporan-penjualan-{$dari->toDateString()}_{$sampai->toDateString()}.csv", ['Content-Type' => 'text/csv; charset=UTF-8']);

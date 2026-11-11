@@ -8,9 +8,19 @@
   $namaMetode = fn ($t) => ($metode[$t->metode] ?? ($t->metode ?: '-')) . ($t->metode === 'transfer' && $t->bank ? ' (' . ($bankLabel[$t->bank] ?? $t->bank) . ')' : '');
 @endphp
 <section class="panel">
-  <h2>Daftar Transaksi</h2>
-  <p class="sub">Verifikasi pembayaran: saat ditandai lunas, stok produk otomatis dikurangi</p>
-  <div class="tw"><table>
+  <div class="tbar">
+    <div><h2>Daftar Transaksi</h2>
+    <p class="sub" style="margin-bottom:0">Verifikasi pembayaran: saat ditandai lunas, stok produk otomatis dikurangi</p></div>
+    <form class="tf" method="get" action="{{ route('admin.transaksi') }}" role="search">
+      <input type="search" name="q" value="{{ $q }}" maxlength="30" placeholder="Cari no. transaksi, mis. TRX-0007" aria-label="Cari nomor transaksi">
+      <button class="btn sm">Cari</button>
+      @if ($q !== '')<a class="btn out sm" href="{{ route('admin.transaksi') }}">Reset</a>@endif
+    </form>
+  </div>
+  @if ($q !== '')
+    <p class="sub" style="margin:12px 0 0">{{ $transaksi->total() }} transaksi ditemukan untuk "{{ $q }}"</p>
+  @endif
+  <div class="tw" style="margin-top:14px"><table>
     <thead><tr><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Total</th><th>Metode</th><th>Pembayaran</th><th>Aksi</th></tr></thead>
     <tbody>
     @forelse ($transaksi as $t)
@@ -34,7 +44,7 @@
         </td>
       </tr>
     @empty
-      <tr><td colspan="7" class="empty">Belum ada transaksi.</td></tr>
+      <tr><td colspan="7" class="empty">{{ $q !== '' ? 'Transaksi dengan nomor tersebut tidak ditemukan.' : 'Belum ada transaksi.' }}</td></tr>
     @endforelse
     </tbody>
   </table></div>

@@ -5,6 +5,13 @@
   $rp = fn ($n) => 'Rp ' . number_format($n, 0, ',', '.');
   $kosong = ['mode' => $mode];
   $puncak = collect($grafik)->sum('nilai') > 0 ? collect($grafik)->search(fn ($g) => $g['nilai'] === collect($grafik)->max('nilai')) : -1;
+  // Angka ringkas untuk label batang grafik: 1,2 jt / 350 rb / 900
+  $ringkasRp = function ($n) {
+    if ($n >= 1000000) return rtrim(rtrim(number_format($n / 1000000, 1, ',', ''), '0'), ',') . ' jt';
+    if ($n >= 1000) return rtrim(rtrim(number_format($n / 1000, 1, ',', ''), '0'), ',') . ' rb';
+    return (string) (int) $n;
+  };
+  $rapat = count($grafik) > 14; // grafik padat: angka hanya di batang tertinggi
   $stg = ['diproses' => ['b', 'Diproses'], 'dikirim' => ['b', 'Dikirim'], 'selesai' => ['g', 'Selesai'], 'menunggu' => ['y', 'Menunggu']];
 @endphp
 <section class="panel">
@@ -42,7 +49,7 @@
     <p class="sub">Total pembayaran lunas, {{ $dari->format('d/m/Y') }} - {{ $sampai->format('d/m/Y') }}</p>
     <div class="chart {{ count($grafik) > 14 ? 'dense' : '' }}" role="img" aria-label="Grafik penjualan">
       @foreach ($grafik as $i => $g)
-        <div title="{{ $g['label'] }}: {{ $rp($g['nilai']) }}"><i class="{{ $i === $puncak ? 'hi' : '' }}" style="height:{{ max($g['nilai'] / $maks * 85, 4) }}%"></i>{{ $g['label'] }}</div>
+        <div title="{{ $g['label'] }}: {{ $rp($g['nilai']) }}">@if ($g['nilai'] > 0 && (! $rapat || $i === $puncak))<em class="v">{{ $ringkasRp($g['nilai']) }}</em>@endif<i class="{{ $i === $puncak ? 'hi' : '' }}" style="height:{{ max($g['nilai'] / $maks * 70, 4) }}%"></i>{{ $g['label'] }}</div>
       @endforeach
     </div>
   </div>
@@ -67,11 +74,12 @@
   <h2>Rincian Transaksi</h2>
   <p class="sub">Transaksi pada periode yang dipilih</p>
   <div class="tw"><table>
-    <thead><tr><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Pembayaran</th></tr></thead>
+    <thead><tr><th style="width:48px">No.</th><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Item</th><th>Total</th><th>Pembayaran</th></tr></thead>
     <tbody>
     @forelse ($rincian as $t)
       @php $nm = $item[$t->id_transaksi] ?? collect(); $ok = strtolower($t->status_pembayaran ?? '') === 'lunas'; @endphp
       <tr>
+        <td>{{ $rincian->firstItem() + $loop->index }}</td>
         <td>TRX-{{ str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT) }}</td>
         <td>{{ \Illuminate\Support\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
         <td>{{ $t->nama }}</td>
@@ -80,7 +88,7 @@
         <td><span class="bd {{ $ok ? 'g' : 'y' }}">{{ $ok ? 'Lunas' : 'Menunggu' }}</span></td>
       </tr>
     @empty
-      <tr><td colspan="6" class="empty">Tidak ada transaksi pada periode ini.</td></tr>
+      <tr><td colspan="7" class="empty">Tidak ada transaksi pada periode ini.</td></tr>
     @endforelse
     </tbody>
   </table></div>

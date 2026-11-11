@@ -62,11 +62,12 @@
 
   <h2>Rincian Transaksi</h2>
   <table>
-    <thead><tr><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Item</th><th class="r">Total</th><th>Pembayaran</th></tr></thead>
+    <thead><tr><th style="width:36px">No.</th><th>No. Transaksi</th><th>Tanggal</th><th>Pelanggan</th><th>Item</th><th class="r">Total</th><th>Pembayaran</th></tr></thead>
     <tbody>
     @forelse ($rincian as $t)
       @php $nm = $item[$t->id_transaksi] ?? collect(); @endphp
       <tr>
+        <td>{{ $loop->iteration }}</td>
         <td>TRX-{{ str_pad($t->id_transaksi, 4, '0', STR_PAD_LEFT) }}</td>
         <td>{{ \Illuminate\Support\Carbon::parse($t->tanggal)->format('d/m/Y') }}</td>
         <td>{{ $t->nama }}</td>
@@ -75,7 +76,7 @@
         <td>{{ strtolower($t->status_pembayaran ?? '') === 'lunas' ? 'Lunas' : 'Menunggu' }}</td>
       </tr>
     @empty
-      <tr><td colspan="6" style="color:#6b7280">Tidak ada transaksi pada periode ini.</td></tr>
+      <tr><td colspan="7" style="color:#6b7280">Tidak ada transaksi pada periode ini.</td></tr>
     @endforelse
     </tbody>
   </table>

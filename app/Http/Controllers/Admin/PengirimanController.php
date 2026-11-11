@@ -11,15 +11,29 @@ use RuntimeException;
 
 class PengirimanController extends Controller
 {
-    public function index()
+    public function index(Request $r)
     {
+        $q = mb_substr(trim((string) $r->query('q', '')), 0, 50);
+        $like = '%' . addcslashes($q, '%_\\') . '%';
+        // "TRX-0007", "trx7", "0007" atau "7" (boleh sebagian) dicari juga sebagai nomor transaksi
+        $angka = $q !== '' && preg_match('/^(?:trx[\s-]*)?(\d+)$/i', $q, $m) ? (ltrim($m[1], '0') ?: '0') : null;
+
         $kirim = DB::table('pengiriman as g')
             ->join('transaksi as t', 't.id_transaksi', '=', 'g.id_transaksi')
             ->join('pelanggan as p', 'p.id_pelanggan', '=', 't.id_pelanggan')
+            ->when($q !== '', fn ($b) => $b->where(function ($w) use ($like, $angka) {
+                // nomor transaksi, pelanggan, penerima, no. resi, atau kurir
+                $w->where('p.nama', 'like', $like)
+                  ->orWhere('g.nama_penerima', 'like', $like)
+                  ->orWhere('g.no_resi', 'like', $like)
+                  ->orWhere('g.kurir', 'like', $like);
+                if ($angka !== null) $w->orWhereRaw('CAST(g.id_transaksi AS CHAR) like ?', ['%' . $angka . '%']);
+            }))
             ->orderByRaw("FIELD(LOWER(g.status_pengiriman),'diproses','dikirim','menunggu','selesai')")
             ->orderByDesc('g.id_transaksi')
-            ->paginate(10, ['g.id_transaksi', 'g.jenis', 'g.alamat_pengiriman', 'g.nama_penerima', 'g.status_pengiriman', 'g.kurir', 'g.no_resi', 'g.estimasi_tiba', 'p.nama']);
-        return view('admin.pengiriman', compact('kirim'));
+            ->paginate(10, ['g.id_transaksi', 'g.jenis', 'g.alamat_pengiriman', 'g.nama_penerima', 'g.status_pengiriman', 'g.kurir', 'g.no_resi', 'g.estimasi_tiba', 'p.nama'])
+            ->withQueryString();
+        return view('admin.pengiriman', compact('kirim', 'q'));
     }
 
     public function show(int $id)

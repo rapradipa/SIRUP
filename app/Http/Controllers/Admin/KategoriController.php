@@ -20,6 +20,13 @@ class KategoriController extends Controller
         return view('admin.kategori', compact('kategori', 'pilihan'));
     }
 
+    /** Balasan untuk AJAX (JSON) atau biasa (redirect back). */
+    private function balas(Request $r, bool $ok, string $pesan)
+    {
+        if ($r->expectsJson()) return response()->json(['ok' => $ok, 'pesan' => $pesan]);
+        return back()->with($ok ? 'ok' : 'err', $pesan);
+    }
+
     private function validasi(Request $r): array
     {
         return $r->validate([
@@ -35,7 +42,7 @@ class KategoriController extends Controller
             'nama_kategori' => trim($d['nama_kategori']),
             'ikon' => $d['ikon'] ?? 'tag',
         ]);
-        return back()->with('ok', 'Kategori ditambahkan.');
+        return $this->balas($r, true, 'Kategori ditambahkan.');
     }
 
     public function perbarui(Request $r, int $id)
@@ -45,17 +52,17 @@ class KategoriController extends Controller
         $data = ['nama_kategori' => trim($d['nama_kategori'])];
         if (! empty($d['ikon'])) $data['ikon'] = $d['ikon'];
         DB::table('kategori')->where('id_kategori', $id)->update($data);
-        return back()->with('ok', 'Kategori diperbarui.');
+        return $this->balas($r, true, 'Kategori diperbarui.');
     }
 
-    public function hapus(int $id)
+    public function hapus(Request $r, int $id)
     {
         $k = DB::table('kategori')->where('id_kategori', $id)->first();
         abort_if(! $k, 404);
         if (DB::table('produk')->where('id_kategori', $id)->exists()) {
-            return back()->with('err', "Kategori \"{$k->nama_kategori}\" masih dipakai produk, jadi tidak bisa dihapus.");
+            return $this->balas($r, false, "Kategori \"{$k->nama_kategori}\" masih dipakai produk, jadi tidak bisa dihapus.");
         }
         DB::table('kategori')->where('id_kategori', $id)->delete();
-        return back()->with('ok', "Kategori \"{$k->nama_kategori}\" dihapus.");
+        return $this->balas($r, true, "Kategori \"{$k->nama_kategori}\" dihapus.");
     }
 }

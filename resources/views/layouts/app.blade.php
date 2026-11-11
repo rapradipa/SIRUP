@@ -11,7 +11,7 @@
 <body>
 @php $u = auth()->user(); @endphp
 @hasSection('strip')
-<div class="strip"><div class="in"><span>Belanja perabotan rumah tangga langsung dari toko Raden Group</span><span class="soon" title="Segera hadir">Bantuan</span></div></div>
+<div class="strip"><div class="in"><span>Belanja perabotan rumah tangga langsung dari toko Raden Group</span></div></div>
 @endif
 <header class="top"><div class="in">
   <a class="logo" href="/"><img src="{{ asset('img/logo.png') }}" alt="Raden Group"></a>
@@ -22,7 +22,7 @@
   </form>
   <button form="cari" class="hb navy hide">Cari</button>
   @php $nk = ($u && $u->id_pelanggan) ? (int) \Illuminate\Support\Facades\DB::table('keranjang')->where('id_pelanggan', $u->id_pelanggan)->sum('jumlah') : 0; @endphp
-  <a class="hb" href="{{ route('keranjang') }}"><x-ikon n="cart" :s="18" /><span class="lb">Keranjang</span> @if ($nk)<span class="cnt">{{ $nk }}</span>@endif</a>
+  <a class="hb" id="navKeranjang" href="{{ route('keranjang') }}"><x-ikon n="cart" :s="18" /><span class="lb">Keranjang</span> @if ($nk)<span class="cnt">{{ $nk }}</span>@endif</a>
   @if ($u)
     <a class="hb" href="{{ route('kontak') }}"><x-ikon n="phone" :s="18" /><span class="lb">Kontak</span></a>
     <a class="chip" href="{{ $u->isStaf() ? route('admin.dashboard') : route('akun') }}" title="{{ $u->isStaf() ? 'Dashboard admin' : 'Akun saya' }}"><span class="av">{{ strtoupper(substr($u->nama, 0, 1)) }}</span><span class="lb">{{ $u->nama }}</span></a>
@@ -41,6 +41,7 @@
     </div>
   </div>
 </div>
+@include('partials.ajax')
 <script>
 (function(){
   var bg=document.getElementById('cfBg'), msg=document.getElementById('cfMsg'), ok=document.getElementById('cfOk'), cancel=document.getElementById('cfCancel');
@@ -57,7 +58,7 @@
       ok.focus();
     }
   });
-  ok.addEventListener('click', function(){ var f=target; tutup(); if (f) f.submit(); });
+  ok.addEventListener('click', function(){ var f=target; tutup(); if (!f) return; if (f.hasAttribute('data-ajax') && f.requestSubmit) { f.setAttribute('data-ok','1'); f.requestSubmit(); } else f.submit(); });
   cancel.addEventListener('click', tutup);
   bg.addEventListener('click', function(e){ if (e.target===bg) tutup(); });
   document.addEventListener('keydown', function(e){ if (e.key==='Escape' && !bg.hidden) tutup(); });

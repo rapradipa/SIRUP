@@ -12,7 +12,8 @@
 <form method="post" enctype="multipart/form-data" action="{{ $p ? route('admin.produk.perbarui', $p->id_produk) : route('admin.produk.simpan') }}">
   @csrf
   @if ($p) @method('PUT') @endif
-  <p class="crumb"><a href="{{ route('admin.produk') }}">Produk &amp; Kategori</a> &rsaquo; <span>{{ $p ? 'Ubah Produk' : 'Tambah Produk' }}</span></p>
+  <input type="hidden" name="kembali" value="{{ $kembali }}">
+  <p class="crumb"><a href="{{ $kembali }}">Produk &amp; Kategori</a> &rsaquo; <span>{{ $p ? 'Ubah Produk' : 'Tambah Produk' }}</span></p>
   <h1 class="pt">{{ $p ? 'Ubah Produk' : 'Tambah Produk Baru' }}</h1>
 
   <div class="pf">
@@ -86,7 +87,7 @@
   </div>
 
   <div class="fa">
-    <a class="btn out" href="{{ route('admin.produk') }}">Batal</a>
+    <a class="btn out" href="{{ $kembali }}">Batal</a>
     <button class="btn"><x-ikon n="check" :s="16" /> Simpan Produk</button>
   </div>
 </form>

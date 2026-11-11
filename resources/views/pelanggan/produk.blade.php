@@ -43,7 +43,7 @@
           </div>
         @endunless
         <div class="acts">
-          <button name="aksi" value="tambah" class="btn out" @disabled($habis)><x-ikon n="cart" :s="16" /> Tambah ke Keranjang</button>
+          <button name="aksi" value="tambah" class="btn out" data-ajax @disabled($habis)><x-ikon n="cart" :s="16" /> Tambah ke Keranjang</button>
           <button name="aksi" value="beli" class="btn" @disabled($habis)>Beli Sekarang</button>
         </div>
       </form>

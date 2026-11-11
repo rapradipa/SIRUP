@@ -31,7 +31,7 @@
     @if ($habis)
       <button type="button" class="btn dis" disabled>Stok Habis</button>
     @else
-      <form method="post" action="{{ route('keranjang.tambah') }}">
+      <form method="post" action="{{ route('keranjang.tambah') }}" data-ajax>
         @csrf
         <input type="hidden" name="id_produk" value="{{ $p->id_produk }}">
         <button class="btn"><x-ikon n="cart" :s="16" /> Tambah ke Keranjang</button>

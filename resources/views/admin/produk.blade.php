@@ -16,7 +16,7 @@
     </form>
     <div class="tb-r">
       <a class="btn out" href="{{ route('admin.kategori') }}">Kelola Kategori</a>
-      <a class="btn" href="{{ route('admin.produk.baru') }}"><x-ikon n="plus" :s="16" /> Tambah Produk</a>
+      <a class="btn" href="{{ route('admin.produk.baru', ['kembali' => request()->getRequestUri()]) }}"><x-ikon n="plus" :s="16" /> Tambah Produk</a>
     </div>
   </div>
   <h2>Daftar Produk</h2>
@@ -35,8 +35,8 @@
         <td>{{ $rp($p->harga * (100 - $p->diskon) / 100) }}@if ($p->diskon) <span class="bd r">-{{ $p->diskon }}%</span>@endif</td>
         <td><span class="bd {{ $kls }}">{{ $lbl }}</span> <small class="mu">{{ $p->stok }}</small></td>
         <td class="aks">
-          <a class="ib2" href="{{ route('admin.produk.ubah', $p->id_produk) }}" aria-label="Ubah {{ $p->nama_produk }}"><x-ikon n="edit" :s="15" /></a>
-          <form method="post" action="{{ route('admin.produk.hapus', $p->id_produk) }}" data-confirm="{{ 'Hapus produk ' . $p->nama_produk . '?' }}" data-confirm-danger>
+          <a class="ib2" href="{{ route('admin.produk.ubah', [$p->id_produk, 'kembali' => request()->getRequestUri()]) }}" aria-label="Ubah {{ $p->nama_produk }}"><x-ikon n="edit" :s="15" /></a>
+          <form method="post" action="{{ route('admin.produk.hapus', $p->id_produk) }}" data-confirm="{{ 'Hapus produk ' . $p->nama_produk . '?' }}" data-confirm-danger data-ajax data-refresh>
             @csrf @method('DELETE')
             <button class="ib2 red" aria-label="Hapus {{ $p->nama_produk }}"><x-ikon n="trash" :s="15" /></button>
           </form>

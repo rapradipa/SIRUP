@@ -7,17 +7,25 @@ use App\Models\Akun;
 use App\Support\Pesan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PenggunaController extends Controller
 {
-    public function index()
+    public function index(Request $r)
     {
+        $q = mb_substr(trim((string) $r->query('q', '')), 0, 50);
+        $like = '%' . addcslashes($q, '%_\\') . '%';
+
         $akun = DB::table('akun as a')
             ->leftJoin('karyawan as k', 'k.id_karyawan', '=', 'a.id_karyawan')
             ->leftJoin('pelanggan as p', 'p.id_pelanggan', '=', 'a.id_pelanggan')
+            ->when($q !== '', fn ($b) => $b->where(fn ($w) => $w
+                ->whereRaw('COALESCE(k.nama, p.nama) like ?', [$like])   // nama
+                ->orWhere('a.no_telp', 'like', $like)))                   // atau no. telepon
             ->orderByRaw("FIELD(a.role,'admin','kasir','pelanggan')")->orderBy('a.id_akun')
-            ->paginate(12, ['a.id_akun', 'a.no_telp', 'a.role', DB::raw('COALESCE(k.nama, p.nama) as nama')]);
-        return view('admin.pengguna', compact('akun'));
+            ->paginate(12, ['a.id_akun', 'a.no_telp', 'a.role', DB::raw('COALESCE(k.nama, p.nama) as nama')])
+            ->withQueryString();
+        return view('admin.pengguna', compact('akun', 'q'));
     }
 
     public function baru()
@@ -62,13 +70,59 @@ class PenggunaController extends Controller
         return redirect()->route('admin.pengguna.show', $id)->with('ok', 'Kata sandi akun berhasil diubah.');
     }
 
-    public function hapus(int $id)
+    /** Alamat daftar pengguna (lengkap dengan halaman) tempat pengguna datang; aman dari open-redirect. */
+    private function kembali(Request $r): string
+    {
+        $u = (string) ($r->input('kembali') ?? '');
+        $path = parse_url(route('admin.pengguna'), PHP_URL_PATH);
+        $aman = str_starts_with($u, '/') && ! str_starts_with($u, '//') && ($u === $path || str_starts_with($u, $path . '?'));
+        return $aman ? $u : route('admin.pengguna');
+    }
+
+    /**
+     * Hapus akun pengguna.
+     * - Staf (admin/kasir): akun dihapus; data karyawan ikut dihapus bila tidak punya transaksi.
+     * - Pelanggan: akun, keranjang, dan buku alamatnya dihapus. Bila pernah bertransaksi, data pelanggan
+     *   dipertahankan agar riwayat transaksi/invoice tetap utuh; bila belum, seluruh datanya dihapus.
+     */
+    public function hapus(Request $r, int $id)
     {
         $a = Akun::where('id_akun', $id)->firstOrFail();
-        if ($a->id_akun === auth()->id()) return back()->with('err', 'Anda tidak bisa menghapus akun yang sedang dipakai.');
-        if ($a->role === 'pelanggan') return back()->with('err', 'Akun pelanggan tidak dihapus dari sini karena terkait riwayat transaksi.');
-        if ($a->role === 'admin' && Akun::where('role', 'admin')->count() <= 1) return back()->with('err', 'Harus tersisa minimal satu admin.');
-        $a->delete(); // hanya akun login; data karyawan tetap ada untuk riwayat transaksi
-        return back()->with('ok', 'Akun login dihapus.');
+        $tujuan = $this->kembali($r);
+
+        if ($a->id_akun === auth()->id()) {
+            return redirect($tujuan)->with('err', 'Anda tidak bisa menghapus akun yang sedang dipakai.');
+        }
+        if ($a->role === 'admin' && Akun::where('role', 'admin')->count() <= 1) {
+            return redirect($tujuan)->with('err', 'Harus tersisa minimal satu admin.');
+        }
+
+        $pesan = DB::transaction(function () use ($a) {
+            if ($a->id_pelanggan) {
+                $idP = $a->id_pelanggan;
+                $adaTransaksi = DB::table('transaksi')->where('id_pelanggan', $idP)->exists();
+                DB::table('keranjang')->where('id_pelanggan', $idP)->delete();
+                DB::table('alamat')->where('id_pelanggan', $idP)->delete();
+                $a->delete();
+                if (! $adaTransaksi) {
+                    DB::table('pelanggan')->where('id_pelanggan', $idP)->delete();
+                    return 'Akun pelanggan beserta datanya dihapus.';
+                }
+                return 'Akun pelanggan dihapus. Riwayat transaksinya tetap tersimpan.';
+            }
+
+            $idK = $a->id_karyawan;
+            $a->delete();
+            if ($idK && ! DB::table('transaksi')->where('id_karyawan', $idK)->exists()) {
+                DB::table('karyawan')->where('id_karyawan', $idK)->delete();
+            }
+            return 'Akun ' . $a->role . ' dihapus.';
+        });
+
+        // Keluarkan pengguna tersebut jika sedang login di perangkat lain
+        if (Schema::hasTable('sessions')) {
+            DB::table('sessions')->where('user_id', $a->id_akun)->delete();
+        }
+        return redirect($tujuan)->with('ok', $pesan);
     }
 }

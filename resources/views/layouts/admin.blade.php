@@ -59,6 +59,13 @@
   </div>
 </div>
 @include('partials.ajax')
+@include('partials.tabel-hp')
+<script>
+(function(){ /* HP: menu admin bisa digeser; tampilkan menu yang sedang aktif */
+  var n=document.querySelector('.side nav'), a=n&&n.querySelector('a.on');
+  if (a) n.scrollLeft = a.offsetLeft - (n.clientWidth - a.offsetWidth) / 2;
+})();
+</script>
 <script>
 (function(){
   var bg=document.getElementById('cfBg'), msg=document.getElementById('cfMsg'), ok=document.getElementById('cfOk'), cancel=document.getElementById('cfCancel');

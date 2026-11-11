@@ -7,7 +7,8 @@
   <div class="kg">
     <aside>
       <form id="fl" class="panel fp" method="get" action="{{ route('katalog') }}">
-        <h2>Filter Produk</h2>
+        <details class="fdet" open>
+        <summary class="fsum"><h2>Filter Produk</h2><span class="fchev" aria-hidden="true">&#9662;</span></summary>
         @if ($f['q'] !== '')<input type="hidden" name="q" value="{{ $f['q'] }}">@endif
         <h3>Kategori</h3>
         @foreach ($kategori as $k)
@@ -21,6 +22,7 @@
         <h3>Ketersediaan</h3>
         <label class="ck"><input type="checkbox" name="tersedia" value="1" @checked($f['ada'])> Stok tersedia</label>
         <button class="btn full" style="margin-top:16px;height:44px">Terapkan Filter</button>
+        </details>
       </form>
     </aside>
 
@@ -50,3 +52,6 @@
   </div>
 </div>
 @endsection
+@push('scripts')
+<script>(function(){var d=document.querySelector('.fdet');if(d&&window.matchMedia('(max-width:1000px)').matches)d.open=false;})();</script>
+@endpush

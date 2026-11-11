@@ -95,7 +95,7 @@
     </div>
   </section>
 
-  <table>
+  <div style="overflow-x:auto"><table>
     <thead><tr><th>INFO PRODUK</th><th class="r">JUMLAH</th><th class="r">HARGA SATUAN</th><th class="r">TOTAL HARGA</th></tr></thead>
     <tbody>
     @foreach ($items as $i)
@@ -107,7 +107,7 @@
       </tr>
     @endforeach
     </tbody>
-  </table>
+  </table></div>
 
   <div class="sum">
     @if ($adaDiskon)

@@ -9,7 +9,7 @@
   <nav class="crumb" aria-label="Breadcrumb"><a href="{{ route('beranda') }}">Beranda</a> &rsaquo; <a href="{{ route('pesanan') }}">Pesanan Saya</a> &rsaquo; <span>Lacak Pengiriman</span></nav>
   <div class="kh">
     <h1 class="pt" style="margin:0">Lacak Pengiriman</h1>
-    <form class="fbar" style="margin:0;min-width:340px" method="get" action="{{ route('lacak') }}" role="search">
+    <form class="fbar" style="margin:0;min-width:min(340px,100%)" method="get" action="{{ route('lacak') }}" role="search">
       <input type="search" name="q" value="{{ $q }}" maxlength="60" placeholder="Masukkan No. Transaksi atau No. Resi" aria-label="No. Transaksi atau No. Resi">
       <button class="btn sm">Lacak</button>
     </form>

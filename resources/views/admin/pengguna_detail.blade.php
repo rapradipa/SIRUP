@@ -26,6 +26,22 @@
       <div class="pw"><input type="password" id="password_confirmation" name="password_confirmation" autocomplete="new-password"><button type="button" data-lihat="password_confirmation" aria-label="Tampilkan atau sembunyikan kata sandi"><x-ikon n="eye" :s="18" /></button></div></div>
     <div class="fa"><a class="btn out" href="{{ route('admin.pengguna') }}">Kembali</a><button class="btn"><x-ikon n="check" :s="16" /> Simpan Kata Sandi</button></div>
   </form>
+
+  @if ($a->id_akun !== auth()->id())
+  <form class="panel" method="post" action="{{ route('admin.pengguna.hapus', $a->id_akun) }}"
+        data-confirm="{{ $a->role === 'pelanggan' ? 'Hapus akun pelanggan ' . ($a->nama ?? '') . '? Riwayat transaksinya tetap tersimpan.' : 'Hapus akun ' . ($a->nama ?? '') . '? Orang ini tidak bisa masuk lagi.' }}" data-confirm-danger>
+    @csrf @method('DELETE')
+    <h2 style="color:var(--red)"><x-ikon n="trash" :s="18" style="vertical-align:-3px" /> Hapus Akun</h2>
+    <p class="sub" style="margin-top:6px">
+      @if ($a->role === 'pelanggan')
+        Pelanggan tidak bisa masuk lagi dan keranjang serta alamat tersimpannya dihapus. Riwayat transaksi yang sudah ada tetap tersimpan. Jika belum pernah bertransaksi, seluruh datanya ikut dihapus.
+      @else
+        Akun staf ini tidak bisa masuk lagi ke panel. Tindakan ini tidak dapat dibatalkan.
+      @endif
+    </p>
+    <div class="fa" style="margin-top:0"><button class="btn" style="background:var(--red);border-color:var(--red)"><x-ikon n="trash" :s="16" /> Hapus Akun Ini</button></div>
+  </form>
+  @endif
 </div>
 @endsection
 @push('scripts')

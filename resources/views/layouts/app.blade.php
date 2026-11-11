@@ -17,8 +17,8 @@
   <a class="logo" href="/"><img src="{{ asset('img/logo.png') }}" alt="Raden Group"></a>
   <form id="cari" class="sr" method="get" action="{{ route('katalog') }}" role="search">
     <x-ikon n="search" :s="18" />
-    <input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="Cari lemari, kulkas, kasur, dan perabotan lainnya" aria-label="Cari produk">
-    <a class="cam" href="{{ route('cari.foto') }}"><x-ikon n="camera" :s="16" /> Cari dengan Foto</a>
+    <input type="search" name="q" value="{{ request('q') }}" maxlength="100" placeholder="Cari lemari, kulkas, kasur..." aria-label="Cari produk">
+    <a class="cam" href="{{ route('cari.foto') }}" aria-label="Cari dengan foto"><x-ikon n="camera" :s="16" /><span class="ct">Cari dengan Foto</span></a>
   </form>
   <button form="cari" class="hb navy hide">Cari</button>
   @php $nk = ($u && $u->id_pelanggan) ? (int) \Illuminate\Support\Facades\DB::table('keranjang')->where('id_pelanggan', $u->id_pelanggan)->sum('jumlah') : 0; @endphp
@@ -42,6 +42,7 @@
   </div>
 </div>
 @include('partials.ajax')
+@include('partials.tabel-hp')
 <script>
 (function(){
   var bg=document.getElementById('cfBg'), msg=document.getElementById('cfMsg'), ok=document.getElementById('cfOk'), cancel=document.getElementById('cfCancel');
